@@ -87,6 +87,27 @@ describe('isRecordFieldReadOnly', () => {
     expect(result).toBe(false);
   });
 
+  it('should return true when field is a formula field', () => {
+    const result = isRecordFieldReadOnly({
+      ...mockParams,
+      fieldMetadataItem: {
+        id: 'field-123',
+        isUIEditable: true,
+      },
+      fieldDefinition: {
+        fieldMetadataId: 'field-123',
+        label: 'Formula',
+        iconName: 'IconMathFunction',
+        type: FieldMetadataType.FORMULA,
+        metadata: {
+          fieldName: 'formula',
+        },
+      },
+    });
+
+    expect(result).toBe(true);
+  });
+
   it('should return true when field is from the standard application on a system object', () => {
     const result = isRecordFieldReadOnly({
       ...mockParams,

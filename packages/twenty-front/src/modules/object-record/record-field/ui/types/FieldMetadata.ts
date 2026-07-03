@@ -5,6 +5,7 @@ import { type CurrencyCode } from 'twenty-shared/constants';
 import {
   ConnectedAccountProvider,
   type AllowedAddressSubField,
+  type FieldMetadataFormulaSettings,
   type FieldMetadataMultiItemSettings,
   type FileCategory,
 } from 'twenty-shared/types';
@@ -199,6 +200,10 @@ export type FieldFilesMetadata = BaseFieldMetadata & {
   settings?: FieldMetadataMultiItemSettings | null;
 };
 
+export type FieldFormulaMetadata = BaseFieldMetadata & {
+  settings?: FieldMetadataFormulaSettings | null;
+};
+
 export type FieldMetadata =
   | FieldBooleanMetadata
   | FieldCurrencyMetadata
@@ -207,6 +212,7 @@ export type FieldMetadata =
   | FieldEmailMetadata
   | FieldEmailsMetadata
   | FieldFilesMetadata
+  | FieldFormulaMetadata
   | FieldFullNameMetadata
   | FieldLinkMetadata
   | FieldLinksMetadata
@@ -233,6 +239,7 @@ export type FieldDateTimeValue = string | null;
 export type FieldDateValue = string | null;
 export type FieldNumberValue = number | null;
 export type FieldBooleanValue = boolean;
+export type FieldFormulaValue = number | string | boolean | null;
 
 export type FieldEmailsValue = {
   primaryEmail: string;

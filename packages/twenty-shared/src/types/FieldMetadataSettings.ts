@@ -1,6 +1,7 @@
 import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
+import { type FormulaOutputType } from '@/types/FormulaOutputType';
 import { type IsExactly } from '@/types/IsExactly';
 import { type RelationOnDeleteAction } from '@/types/RelationOnDeleteAction.type';
 import { type RelationType } from '@/types/RelationType';
@@ -62,6 +63,11 @@ type FieldMetadataFilesSettings = {
   maxNumberOfValues: number;
 };
 
+export type FieldMetadataFormulaSettings = {
+  expression: string;
+  outputType: FormulaOutputType;
+};
+
 export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.NUMBER]: FieldMetadataNumberSettings | null;
   [FieldMetadataType.CURRENCY]: FieldMetadataCurrencySettings | null;
@@ -77,6 +83,7 @@ export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.LINKS]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.ARRAY]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.FILES]: FieldMetadataFilesSettings;
+  [FieldMetadataType.FORMULA]: FieldMetadataFormulaSettings;
 };
 
 export type AllFieldMetadataSettings =

@@ -1,5 +1,13 @@
-import { FieldMetadataType } from 'twenty-shared/types';
-import { assertUnreachable } from 'twenty-shared/utils';
+import {
+  type AllFieldMetadataSettings,
+  FieldMetadataType,
+} from 'twenty-shared/types';
+import {
+  assertUnreachable,
+  mapFormulaOutputTypeToFieldMetadataType,
+} from 'twenty-shared/utils';
+
+import { isFieldMetadataSettingsOfType } from 'src/engine/metadata-modules/field-metadata/utils/is-field-metadata-settings-of-type.util';
 
 import {
   ARRAY_FILTER_OPERATORS,
@@ -17,10 +25,23 @@ import { type FilterOperator } from 'src/engine/api/common/common-args-processor
 
 export const getOperatorsForFieldType = (
   fieldType: FieldMetadataType,
+  fieldSettings: AllFieldMetadataSettings | null = null,
 ): FilterOperator[] => {
   switch (fieldType) {
     case FieldMetadataType.TEXT:
       return STRING_FILTER_OPERATORS;
+
+    case FieldMetadataType.FORMULA: {
+      if (
+        !isFieldMetadataSettingsOfType(fieldSettings, FieldMetadataType.FORMULA)
+      ) {
+        return STRING_FILTER_OPERATORS;
+      }
+
+      return getOperatorsForFieldType(
+        mapFormulaOutputTypeToFieldMetadataType(fieldSettings.outputType),
+      );
+    }
 
     case FieldMetadataType.NUMBER:
     case FieldMetadataType.NUMERIC:

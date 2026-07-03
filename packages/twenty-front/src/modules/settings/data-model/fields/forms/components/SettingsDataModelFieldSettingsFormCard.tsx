@@ -15,6 +15,8 @@ import { settingsDataModelFieldCurrencyFormSchema } from '@/settings/data-model/
 import { SettingsDataModelFieldCurrencySettingsFormCard } from '@/settings/data-model/fields/forms/currency/components/SettingsDataModelFieldCurrencySettingsFormCard';
 import { settingsDataModelFieldDateFormSchema } from '@/settings/data-model/fields/forms/date/components/SettingsDataModelFieldDateForm';
 import { SettingsDataModelFieldDateSettingsFormCard } from '@/settings/data-model/fields/forms/date/components/SettingsDataModelFieldDateSettingsFormCard';
+import { settingsDataModelFieldFormulaFormSchema } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
+import { SettingsDataModelFieldFormulaSettingsFormCard } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaSettingsFormCard';
 import { settingsDataModelFieldMorphRelationFormSchema } from '@/settings/data-model/fields/forms/morph-relation/components/SettingsDataModelFieldRelationForm';
 import { settingsDataModelFieldNumberFormSchema } from '@/settings/data-model/fields/forms/number/components/SettingsDataModelFieldNumberForm';
 import { SettingsDataModelFieldNumberSettingsFormCard } from '@/settings/data-model/fields/forms/number/components/SettingsDataModelFieldNumberSettingsFormCard';
@@ -127,6 +129,10 @@ const filesFieldFormSchema = z
   .object({ type: z.literal(FieldMetadataType.FILES) })
   .merge(mergeSettingsSchemas(settingsDataModelFieldMaxValuesSchema));
 
+const formulaFieldFormSchema = z
+  .object({ type: z.literal(FieldMetadataType.FORMULA) })
+  .extend(settingsDataModelFieldFormulaFormSchema.shape);
+
 const otherFieldsFormSchema = z
   .object({
     type: z.enum(
@@ -148,6 +154,7 @@ const otherFieldsFormSchema = z
           FieldMetadataType.LINKS,
           FieldMetadataType.ARRAY,
           FieldMetadataType.FILES,
+          FieldMetadataType.FORMULA,
         ]),
       ) as [FieldMetadataType, ...FieldMetadataType[]],
     ),
@@ -173,6 +180,7 @@ export const settingsDataModelFieldSettingsFormSchema = z.discriminatedUnion(
     linksFieldFormSchema,
     arrayFieldFormSchema,
     filesFieldFormSchema,
+    formulaFieldFormSchema,
     otherFieldsFormSchema,
   ],
 );
@@ -193,6 +201,7 @@ const previewableTypes = [
   FieldMetadataType.DATE_TIME,
   FieldMetadataType.EMAILS,
   FieldMetadataType.FILES,
+  FieldMetadataType.FORMULA,
   FieldMetadataType.FULL_NAME,
   FieldMetadataType.LINKS,
   FieldMetadataType.MULTI_SELECT,
@@ -270,6 +279,16 @@ export const SettingsDataModelFieldSettingsFormCard = ({
   if (fieldType === FieldMetadataType.NUMBER) {
     return (
       <SettingsDataModelFieldNumberSettingsFormCard
+        existingFieldMetadataId={existingFieldMetadataId}
+        objectNameSingular={objectNameSingular}
+        disabled={disabled}
+      />
+    );
+  }
+
+  if (fieldType === FieldMetadataType.FORMULA) {
+    return (
+      <SettingsDataModelFieldFormulaSettingsFormCard
         existingFieldMetadataId={existingFieldMetadataId}
         objectNameSingular={objectNameSingular}
         disabled={disabled}

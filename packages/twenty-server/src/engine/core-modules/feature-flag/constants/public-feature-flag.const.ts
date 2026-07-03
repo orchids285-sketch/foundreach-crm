@@ -36,6 +36,14 @@ export const PUBLIC_FEATURE_FLAGS: PublicFeatureFlag[] = [
         'Sync Gmail, Google Calendar, and Microsoft 365 mail/calendar via provider push notifications instead of cron polling',
     },
   },
+  {
+    key: FeatureFlagKey.IS_FORMULA_FIELDS_ENABLED,
+    metadata: {
+      label: 'Formula Fields',
+      description:
+        'Create read-only fields computed from other fields on the same record (arithmetic, text, conditions, date math)',
+    },
+  },
   ...(process.env.CLOUDFLARE_API_KEY
     ? [
         // {

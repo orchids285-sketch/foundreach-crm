@@ -8,6 +8,8 @@ import { type ColumnType } from 'typeorm';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { type CompositeFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/types/composite-field-metadata-type.type';
+import { mapFormulaOutputTypeToFieldMetadataType } from 'twenty-shared/utils';
+
 import {
   computeColumnName,
   computeCompositeColumnName,
@@ -97,6 +99,28 @@ export const generateCompositeColumnDefinition = ({
   return definition;
 };
 
+const generateFormulaColumnDefinition = (
+  flatFieldMetadata: FlatFieldMetadata<FieldMetadataType.FORMULA>,
+  formulaAsExpression?: string,
+): WorkspaceSchemaColumnDefinition => {
+  const columnName = computeColumnName(flatFieldMetadata.name);
+
+  return {
+    name: columnName,
+    type: fieldMetadataTypeToColumnType(
+      mapFormulaOutputTypeToFieldMetadataType(
+        flatFieldMetadata.settings.outputType,
+      ),
+    ),
+    isNullable: true,
+    isArray: false,
+    default: null,
+    asExpression: formulaAsExpression,
+    generatedType: 'STORED',
+    isPrimary: false,
+  };
+};
+
 const generateTsVectorColumnDefinition = (
   flatFieldMetadata: FlatFieldMetadata<FieldMetadataType.TS_VECTOR>,
   searchVectorAsExpression?: string,
@@ -179,11 +203,13 @@ export const generateColumnDefinitions = ({
   flatObjectMetadata,
   workspaceId,
   searchVectorAsExpression,
+  formulaAsExpression,
 }: {
   flatFieldMetadata: FlatFieldMetadata;
   flatObjectMetadata: FlatObjectMetadata;
   workspaceId: string;
   searchVectorAsExpression?: string;
+  formulaAsExpression?: string;
 }): WorkspaceSchemaColumnDefinition[] => {
   const { tableName, schemaName } = getWorkspaceSchemaContextForMigration({
     workspaceId,
@@ -201,6 +227,14 @@ export const generateColumnDefinitions = ({
         workspaceId,
       }),
     );
+  }
+
+  if (
+    isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.FORMULA)
+  ) {
+    return [
+      generateFormulaColumnDefinition(flatFieldMetadata, formulaAsExpression),
+    ];
   }
 
   if (

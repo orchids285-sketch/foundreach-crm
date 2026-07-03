@@ -90,6 +90,65 @@ export const assertSafeTsVectorExpression = (expression: string): void => {
   }
 };
 
+// Blanks out the contents of '...' strings and "..." identifiers (handling
+// doubled-quote escapes) so forbidden-token checks only see SQL code context.
+const blankOutQuotedSegments = (expression: string): string => {
+  let result = '';
+  let context: 'code' | 'string' | 'identifier' = 'code';
+
+  for (let index = 0; index < expression.length; index++) {
+    const character = expression[index];
+
+    if (context === 'code') {
+      if (character === "'") {
+        context = 'string';
+      } else if (character === '"') {
+        context = 'identifier';
+      }
+      result += character;
+      continue;
+    }
+
+    const closingQuote = context === 'string' ? "'" : '"';
+
+    if (character === closingQuote) {
+      if (expression[index + 1] === closingQuote) {
+        index++;
+      } else {
+        context = 'code';
+        result += character;
+      }
+    }
+  }
+
+  return result;
+};
+
+// Formula expressions may legitimately contain any character inside string
+// literals, so forbidden tokens are only rejected in code context.
+export const isSafeFormulaColumnExpression = (expression: string): boolean => {
+  if (expression.includes('\0')) {
+    return false;
+  }
+
+  const codeOnlyExpression = blankOutQuotedSegments(expression);
+  const hasForbiddenToken = FORBIDDEN_TS_VECTOR_EXPRESSION_TOKENS.some(
+    (token) => codeOnlyExpression.includes(token),
+  );
+
+  if (hasForbiddenToken) {
+    return false;
+  }
+
+  return hasBalancedParentheses(expression);
+};
+
+export const assertSafeFormulaColumnExpression = (expression: string): void => {
+  if (!isSafeFormulaColumnExpression(expression)) {
+    throw new Error('Unsafe formula expression detected');
+  }
+};
+
 // PostgreSQL standard literal quoting: wraps in single quotes and
 // doubles any internal single-quote characters. Prefixes with E when
 // backslashes are present (standard_conforming_strings safety).

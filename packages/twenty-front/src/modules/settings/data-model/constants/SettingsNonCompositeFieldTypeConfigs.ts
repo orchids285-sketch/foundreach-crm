@@ -129,6 +129,12 @@ export const SETTINGS_NON_COMPOSITE_FIELD_TYPE_CONFIGS: SettingsNonCompositeFiel
       exampleValues: ['RATING_3', 'RATING_4', 'RATING_5'],
       category: 'Basic',
     } as const satisfies SettingsFieldTypeConfig<FieldRatingValue>,
+    [FieldMetadataType.FORMULA]: {
+      label: 'Formula',
+      Icon: IllustrationIconNumbers,
+      exampleValues: ['amount * 0.88', 'price * quantity', 'revenue - cost'],
+      category: 'Advanced',
+    } as const satisfies SettingsFieldTypeConfig<string>,
     [FieldMetadataType.RAW_JSON]: {
       label: 'JSON',
       Icon: IllustrationIconJson,

@@ -10,6 +10,7 @@ import { useSelectSettingsFormInitialValues } from '@/settings/data-model/fields
 import { type FieldType } from '@/settings/data-model/types/FieldType';
 import { type SettingsFieldType } from '@/settings/data-model/types/SettingsFieldType';
 import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
+import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { Section } from '@react-email/components';
@@ -21,7 +22,10 @@ import { IconSearch } from 'twenty-ui/icon';
 import { H2Title } from 'twenty-ui/typography';
 import { UndecoratedLink } from 'twenty-ui/navigation';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
-import { FieldMetadataType } from '~/generated-metadata/graphql';
+import {
+  FeatureFlagKey,
+  FieldMetadataType,
+} from '~/generated-metadata/graphql';
 import { type SettingsDataModelFieldTypeFormValues } from '~/pages/settings/data-model/new-field/SettingsObjectNewFieldSelect';
 
 type SettingsObjectNewFieldSelectorProps = {
@@ -74,11 +78,15 @@ export const SettingsObjectNewFieldSelector = ({
   const { control, setValue } =
     useFormContext<SettingsDataModelFieldTypeFormValues>();
   const [searchQuery, setSearchQuery] = useState('');
+  const isFormulaFieldsEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_FORMULA_FIELDS_ENABLED,
+  );
   const fieldTypeConfigs = Object.entries<SettingsFieldTypeConfig<any>>(
     SETTINGS_FIELD_TYPE_CONFIGS,
   ).filter(
     ([key, config]) =>
       !excludedFieldTypes.includes(key as SettingsFieldType) &&
+      (key !== FieldMetadataType.FORMULA || isFormulaFieldsEnabled) &&
       config.label.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 

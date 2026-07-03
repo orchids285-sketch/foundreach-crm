@@ -6,6 +6,7 @@ import { v4 } from 'uuid';
 import { WorkspaceMigrationRunnerActionHandler } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/interfaces/workspace-migration-runner-action-handler-service.interface';
 
 import { ALL_METADATA_ENTITY_BY_METADATA_NAME } from 'src/engine/metadata-modules/flat-entity/constant/all-metadata-entity-by-metadata-name.constant';
+import { deriveFormulaAsExpressionForFormulaField } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-formula-as-expression-for-formula-field.util';
 import { isCompositeFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-composite-flat-field-metadata.util';
 import { isEnumFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-enum-flat-field-metadata.util';
 import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
@@ -147,6 +148,15 @@ export class CreateObjectActionHandlerService extends WorkspaceMigrationRunnerAc
         flatFieldMetadata,
         flatObjectMetadata,
         workspaceId,
+        formulaAsExpression: isFlatFieldMetadataOfType(
+          flatFieldMetadata,
+          FieldMetadataType.FORMULA,
+        )
+          ? deriveFormulaAsExpressionForFormulaField({
+              formulaFlatFieldMetadata: flatFieldMetadata,
+              siblingFlatFieldMetadatas: flatFieldMetadatas,
+            })
+          : undefined,
         searchVectorAsExpression: isFlatFieldMetadataOfType(
           flatFieldMetadata,
           FieldMetadataType.TS_VECTOR,

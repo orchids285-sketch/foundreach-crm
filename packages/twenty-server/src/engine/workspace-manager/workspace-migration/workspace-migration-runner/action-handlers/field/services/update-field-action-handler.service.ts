@@ -17,6 +17,7 @@ import { computeCompositeColumnName } from 'src/engine/metadata-modules/field-me
 import { getCompositeTypeOrThrow } from 'src/engine/metadata-modules/field-metadata/utils/get-composite-type-or-throw.util';
 import { findFlatEntityByIdInFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps-or-throw.util';
 import { findManyFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-many-flat-entity-by-id-in-flat-entity-maps.util';
+import { deriveFormulaAsExpressionForFormulaField } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-formula-as-expression-for-formula-field.util';
 import { findFlatEntityByUniversalIdentifierOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-universal-identifier-or-throw.util';
 import { findFieldRelatedIndexes } from 'src/engine/metadata-modules/flat-field-metadata/utils/find-field-related-index.util';
 import { FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
@@ -345,6 +346,51 @@ export class UpdateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
           );
         }
       }
+    }
+
+    if (update.settings !== undefined) {
+      optimisticFlatFieldMetadata = {
+        ...optimisticFlatFieldMetadata,
+        settings: update.settings,
+      };
+    }
+
+    if (
+      update.settings !== undefined &&
+      isFlatFieldMetadataOfType(
+        optimisticFlatFieldMetadata,
+        FieldMetadataType.FORMULA,
+      )
+    ) {
+      // Postgres has no ALTER for a generated expression: drop and recreate the
+      // column, letting Postgres recompute every row.
+      const formulaAsExpression = deriveFormulaAsExpressionForFormulaField({
+        formulaFlatFieldMetadata: optimisticFlatFieldMetadata,
+        siblingFlatFieldMetadatas: findManyFlatEntityByIdInFlatEntityMaps({
+          flatEntityMaps: flatFieldMetadataMaps,
+          flatEntityIds: flatObjectMetadata.fieldIds,
+        }),
+      });
+
+      const columnDefinitions = generateColumnDefinitions({
+        flatFieldMetadata: optimisticFlatFieldMetadata,
+        flatObjectMetadata,
+        workspaceId,
+        formulaAsExpression,
+      });
+
+      await this.workspaceSchemaManagerService.columnManager.dropColumns({
+        queryRunner,
+        schemaName,
+        tableName,
+        columnNames: [optimisticFlatFieldMetadata.name],
+      });
+      await this.workspaceSchemaManagerService.columnManager.addColumns({
+        queryRunner,
+        schemaName,
+        tableName,
+        columnDefinitions,
+      });
     }
 
     if (

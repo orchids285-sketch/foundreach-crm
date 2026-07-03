@@ -156,6 +156,48 @@ export {
   jsonRelationFilterValueSchema,
 } from './filter/utils/validation-schemas/jsonRelationFilterValueSchema';
 export { formatToShortNumber } from './format/formatToShortNumber';
+export { FORMULA_AST_MAX_DEPTH } from './formula/constants/FormulaAstMaxDepth';
+export { FORMULA_DATE_FUNCTIONS } from './formula/constants/FormulaDateFunctions';
+export { FORMULA_EXPRESSION_MAX_LENGTH } from './formula/constants/FormulaExpressionMaxLength';
+export { FORMULA_FUNCTIONS } from './formula/constants/FormulaFunctions';
+export { FORMULA_LOGICAL_FUNCTIONS } from './formula/constants/FormulaLogicalFunctions';
+export { FORMULA_NUMERIC_FUNCTIONS } from './formula/constants/FormulaNumericFunctions';
+export { FORMULA_TEXT_FUNCTIONS } from './formula/constants/FormulaTextFunctions';
+export type {
+  FormulaBinaryOperator,
+  FormulaUnaryOperator,
+  FormulaFieldReferenceNode,
+  FormulaAstNode,
+} from './formula/types/FormulaAstNode';
+export type { FormulaErrorCode } from './formula/types/FormulaErrorCode';
+export type { FormulaFieldReference } from './formula/types/FormulaFieldReference';
+export type { FormulaFunctionDefinition } from './formula/types/FormulaFunctionDefinition';
+export type {
+  FormulaTokenType,
+  FormulaToken,
+} from './formula/types/FormulaToken';
+export type { FormulaValue } from './formula/types/FormulaValue';
+export type { FormulaValueType } from './formula/types/FormulaValueType';
+export { assertFormulaArgumentCountOrThrow } from './formula/utils/assertFormulaArgumentCountOrThrow';
+export { assertFormulaArgumentTypeOrThrow } from './formula/utils/assertFormulaArgumentTypeOrThrow';
+export { computeFormulaFieldReferenceKey } from './formula/utils/computeFormulaFieldReferenceKey';
+export { computePostgresLeftSlice } from './formula/utils/computePostgresLeftSlice';
+export { computePostgresRightSlice } from './formula/utils/computePostgresRightSlice';
+export { createFormulaError } from './formula/utils/createFormulaError';
+export { evaluateFormulaOrThrow } from './formula/utils/evaluateFormulaOrThrow';
+export { extractFormulaFieldReferences } from './formula/utils/extractFormulaFieldReferences';
+export { inferFormulaReturnTypeOrThrow } from './formula/utils/inferFormulaReturnTypeOrThrow';
+export { inferNumericFunctionReturnTypeOrThrow } from './formula/utils/inferNumericFunctionReturnTypeOrThrow';
+export { inferTextFunctionReturnTypeOrThrow } from './formula/utils/inferTextFunctionReturnTypeOrThrow';
+export { inferTextSliceFunctionReturnTypeOrThrow } from './formula/utils/inferTextSliceFunctionReturnTypeOrThrow';
+export { isBlankFormulaValue } from './formula/utils/isBlankFormulaValue';
+export { mapFieldMetadataTypeToFormulaValueType } from './formula/utils/mapFieldMetadataTypeToFormulaValueType';
+export { mapFormulaOutputTypeToFieldMetadataType } from './formula/utils/mapFormulaOutputTypeToFieldMetadataType';
+export { parseFormulaExpressionOrThrow } from './formula/utils/parseFormulaExpressionOrThrow';
+export { roundHalfAwayFromZero } from './formula/utils/roundHalfAwayFromZero';
+export { tokenizeFormulaExpressionOrThrow } from './formula/utils/tokenizeFormulaExpressionOrThrow';
+export { transpileFormulaToPostgresExpressionOrThrow } from './formula/utils/transpileFormulaToPostgresExpressionOrThrow';
+export { unifyFormulaValueTypesOrThrow } from './formula/utils/unifyFormulaValueTypesOrThrow';
 export { fromArrayToUniqueKeyRecord } from './from-array-to-unique-key-record.util';
 export { fromArrayToValuesByKeyRecord } from './fromArrayToValuesByKeyRecord.util';
 export { getURLSafely } from './getURLSafely';

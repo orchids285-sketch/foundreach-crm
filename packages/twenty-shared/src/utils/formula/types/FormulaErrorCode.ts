@@ -1,0 +1,4 @@
+export type FormulaErrorCode =
+  | 'FORMULA_PARSE_ERROR'
+  | 'FORMULA_TYPE_ERROR'
+  | 'FORMULA_REFERENCE_ERROR';

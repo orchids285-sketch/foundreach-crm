@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { RelationType } from 'twenty-shared/types';
+import { FieldMetadataType, RelationType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { type QueryRunner } from 'typeorm';
 import { v4 } from 'uuid';
@@ -10,7 +10,10 @@ import { WorkspaceMigrationRunnerActionHandler } from 'src/engine/workspace-mana
 
 import { type MetadataFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/metadata-flat-entity-maps.type';
 import { findFlatEntityByIdInFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps-or-throw.util';
+import { findManyFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-many-flat-entity-by-id-in-flat-entity-maps.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
+import { deriveFormulaAsExpressionForFormulaField } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-formula-as-expression-for-formula-field.util';
+import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
 import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { WorkspaceSchemaManagerService } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.service';
@@ -119,7 +122,7 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
     const {
       flatAction,
       queryRunner,
-      allFlatEntityMaps: { flatObjectMetadataMaps },
+      allFlatEntityMaps: { flatObjectMetadataMaps, flatFieldMetadataMaps },
       workspaceId,
     } = context;
     const { flatEntity, relatedFlatFieldMetadata } = flatAction;
@@ -162,6 +165,7 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
           flatFieldMetadata,
           flatObjectMetadata,
           flatObjectMetadataMaps,
+          flatFieldMetadataMaps,
           queryRunner,
           schemaName,
           tableName,
@@ -175,6 +179,7 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
     flatFieldMetadata,
     flatObjectMetadata,
     flatObjectMetadataMaps,
+    flatFieldMetadataMaps,
     queryRunner,
     schemaName,
     tableName,
@@ -183,6 +188,7 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
     flatFieldMetadata: FlatFieldMetadata;
     flatObjectMetadata: FlatObjectMetadata;
     flatObjectMetadataMaps: MetadataFlatEntityMaps<'objectMetadata'>;
+    flatFieldMetadataMaps: MetadataFlatEntityMaps<'fieldMetadata'>;
     queryRunner: QueryRunner;
     schemaName: string;
     tableName: string;
@@ -194,10 +200,24 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       operation: EnumOperation.CREATE,
     });
 
+    const formulaAsExpression = isFlatFieldMetadataOfType(
+      flatFieldMetadata,
+      FieldMetadataType.FORMULA,
+    )
+      ? deriveFormulaAsExpressionForFormulaField({
+          formulaFlatFieldMetadata: flatFieldMetadata,
+          siblingFlatFieldMetadatas: findManyFlatEntityByIdInFlatEntityMaps({
+            flatEntityMaps: flatFieldMetadataMaps,
+            flatEntityIds: flatObjectMetadata.fieldIds,
+          }),
+        })
+      : undefined;
+
     const columnDefinitions = generateColumnDefinitions({
       flatFieldMetadata,
       flatObjectMetadata,
       workspaceId,
+      formulaAsExpression,
     });
 
     await executeBatchEnumOperations({

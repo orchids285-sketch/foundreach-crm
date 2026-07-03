@@ -18,6 +18,7 @@ import { isFieldDate } from '@/object-record/record-field/ui/types/guards/isFiel
 import { isFieldDateTime } from '@/object-record/record-field/ui/types/guards/isFieldDateTime';
 import { isFieldEmails } from '@/object-record/record-field/ui/types/guards/isFieldEmails';
 import { isFieldEmailsValue } from '@/object-record/record-field/ui/types/guards/isFieldEmailsValue';
+import { isFieldFormula } from '@/object-record/record-field/ui/types/guards/isFieldFormula';
 import { isFieldFullName } from '@/object-record/record-field/ui/types/guards/isFieldFullName';
 import { isFieldFullNameValue } from '@/object-record/record-field/ui/types/guards/isFieldFullNameValue';
 import { isFieldLinks } from '@/object-record/record-field/ui/types/guards/isFieldLinks';
@@ -62,7 +63,8 @@ export const isFieldValueEmpty = ({
     isFieldRating(fieldDefinition) ||
     isFieldBoolean(fieldDefinition) ||
     isFieldRawJson(fieldDefinition) ||
-    isFieldPosition(fieldDefinition)
+    isFieldPosition(fieldDefinition) ||
+    isFieldFormula(fieldDefinition)
   ) {
     return isValueEmpty(fieldValue);
   }

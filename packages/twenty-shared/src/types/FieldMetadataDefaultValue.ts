@@ -117,6 +117,7 @@ export const FIELD_METADATA_TYPES_WITHOUT_DEFAULT_VALUE = [
   FieldMetadataType.MORPH_RELATION,
   FieldMetadataType.FILES,
   FieldMetadataType.TS_VECTOR,
+  FieldMetadataType.FORMULA,
 ] as const satisfies FieldMetadataType[];
 
 export const isFieldMetadataTypeWithDefaultValue = (

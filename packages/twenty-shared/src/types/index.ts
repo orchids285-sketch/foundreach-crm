@@ -111,6 +111,7 @@ export {
 export type {
   FieldNumberVariant,
   FieldCurrencyFormat,
+  FieldMetadataFormulaSettings,
   FieldMetadataSettingsMapping,
   AllFieldMetadataSettings,
   FieldMetadataSettings,
@@ -129,6 +130,8 @@ export type {
 export { FILTERABLE_FIELD_TYPES } from './FilterableFieldType';
 export { FirstDayOfTheWeek } from './FirstDayOfTheWeek';
 export type { FormatRecordSerializedRelationProperties } from './FormatRecordSerializedRelationProperties.type';
+export type { FormulaOutputType } from './FormulaOutputType';
+export { FORMULA_OUTPUT_TYPES } from './FormulaOutputType';
 export type { FromTo } from './FromToType';
 export { HTTPMethod } from './HttpMethod';
 export type { IndexOf } from './IndexOf.type';

@@ -91,6 +91,7 @@ export const useBuildSpreadsheetImportFields = () => {
       case FieldMetadataType.MORPH_RELATION:
       case FieldMetadataType.ACTOR:
       case FieldMetadataType.TS_VECTOR:
+      case FieldMetadataType.FORMULA:
         return [];
 
       default:
