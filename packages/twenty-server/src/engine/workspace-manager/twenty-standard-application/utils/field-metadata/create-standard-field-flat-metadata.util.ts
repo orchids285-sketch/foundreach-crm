@@ -8,7 +8,6 @@ import {
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER } from 'twenty-shared/application';
 
-import { fromFieldMetadataInputSettingsToUniversalSettings } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-field-metadata-input-settings-to-universal-settings.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { PARTIAL_SYSTEM_FLAT_FIELD_METADATAS } from 'src/engine/metadata-modules/object-metadata/constants/partial-system-flat-field-metadatas.constant';
 import { type AllStandardObjectFieldName } from 'src/engine/workspace-manager/twenty-standard-application/types/all-standard-object-field-name.type';
@@ -120,6 +119,6 @@ export const createStandardFieldFlatMetadata = <
     viewSortUniversalIdentifiers: [],
     searchFieldMetadataIds: [],
     searchFieldMetadataUniversalIdentifiers: [],
-    universalSettings: fromFieldMetadataInputSettingsToUniversalSettings(settings),
+    universalSettings: settings ?? null,
   };
 };

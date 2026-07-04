@@ -50,7 +50,6 @@ export const useCreateRecordFilterFromObjectFilterDropdownCurrentStates =
 
         const filterType = getFilterTypeFromFieldType(
           fieldMetadataItemUsedInDropdown.type,
-          fieldMetadataItemUsedInDropdown.settings,
         );
 
         if (!isDefined(selectedOperandInDropdown)) {

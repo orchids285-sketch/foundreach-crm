@@ -96,12 +96,6 @@ export class TypeMapperService {
       return FilesObjectType;
     }
 
-    if (fieldMetadataType === FieldMetadataType.ROLLUP) {
-      return this.mapToPreBuiltGraphQLOutputType({
-        fieldMetadataType: FieldMetadataType.NUMBER,
-      });
-    }
-
     return this.baseTypeScalarMapping.get(fieldMetadataType);
   }
 
@@ -126,12 +120,6 @@ export class TypeMapperService {
 
     if (fieldMetadataType === FieldMetadataType.FILES) {
       return FilesInputType;
-    }
-
-    if (fieldMetadataType === FieldMetadataType.ROLLUP) {
-      return this.mapToPreBuiltGraphQLInputType({
-        fieldMetadataType: FieldMetadataType.NUMBER,
-      });
     }
 
     return this.baseTypeScalarMapping.get(fieldMetadataType);
@@ -197,10 +185,6 @@ export class TypeMapperService {
       [FieldMetadataType.TS_VECTOR, TSVectorFilterType],
     ]);
 
-    if (fieldMetadataType === FieldMetadataType.ROLLUP) {
-      return this.mapToFilterType(FieldMetadataType.NUMBER);
-    }
-
     return typeFilterMapping.get(fieldMetadataType);
   }
 
@@ -225,7 +209,6 @@ export class TypeMapperService {
       [FieldMetadataType.RAW_JSON, OrderByDirectionType],
       [FieldMetadataType.ARRAY, OrderByDirectionType],
       [FieldMetadataType.TS_VECTOR, OrderByDirectionType], // TODO: Add TSVectorOrderByType
-      [FieldMetadataType.ROLLUP, OrderByDirectionType],
     ]);
 
     return typeOrderByMapping.get(fieldMetadataType);

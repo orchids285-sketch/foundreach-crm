@@ -189,7 +189,6 @@ export class FlatFieldMetadataValidatorService {
               flatFieldMetadataToValidate.name,
           },
           flatFieldMetadataMaps: optimisticFlatFieldMetadataMaps,
-          shouldCheckRollupReferences: false,
         }),
       );
     }
@@ -330,7 +329,6 @@ export class FlatFieldMetadataValidatorService {
         ...validateFlatFieldMetadataIsNotReferencedByComputedField({
           flatFieldMetadataToMutate: flatFieldMetadataToDelete,
           flatFieldMetadataMaps: optimisticFlatFieldMetadataMaps,
-          shouldCheckRollupReferences: true,
         }),
       );
     }

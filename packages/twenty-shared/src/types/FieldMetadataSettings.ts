@@ -1,10 +1,8 @@
 import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
-import { type ChartFilter } from '@/types/page-layout/chart-filter.type';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
 import { type IsExactly } from '@/types/IsExactly';
 import { type RelationOnDeleteAction } from '@/types/RelationOnDeleteAction.type';
-import { type RollupAggregateOperation } from '@/types/RollupAggregateOperation';
 import { type RelationType } from '@/types/RelationType';
 import { type SerializedRelation } from '@/types/SerializedRelation.type';
 
@@ -72,13 +70,6 @@ type FieldMetadataFilesSettings = {
   maxNumberOfValues: number;
 };
 
-export type FieldMetadataRollupSettings = {
-  relationFieldMetadataId: SerializedRelation;
-  targetFieldMetadataId: SerializedRelation | null;
-  aggregateOperation: RollupAggregateOperation;
-  filter?: ChartFilter | null;
-};
-
 export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.NUMBER]: FieldMetadataNumberSettings | null;
   [FieldMetadataType.CURRENCY]: FieldMetadataCurrencySettings | null;
@@ -95,7 +86,6 @@ export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.LINKS]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.ARRAY]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.FILES]: FieldMetadataFilesSettings;
-  [FieldMetadataType.ROLLUP]: FieldMetadataRollupSettings;
 };
 
 export type AllFieldMetadataSettings =

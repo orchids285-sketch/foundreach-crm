@@ -66,7 +66,6 @@ export const useApplyAdvancedFilterRelationTargetField = () => {
 
     const filterType = getFilterTypeFromFieldType(
       relationTargetFieldMetadataItem.type,
-      relationTargetFieldMetadataItem.settings,
     );
 
     const firstOperand = getRecordFilterOperands({

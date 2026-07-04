@@ -1,5 +1,4 @@
 import { msg } from '@lingui/core/macro';
-import { FieldMetadataType } from 'twenty-shared/types';
 import {
   extractFormulaFieldReferences,
   isDefined,
@@ -18,13 +17,11 @@ type ValidateFlatFieldMetadataIsNotReferencedByComputedFieldArgs = {
     'name' | 'universalIdentifier' | 'objectMetadataUniversalIdentifier'
   >;
   flatFieldMetadataMaps: UniversalFlatEntityMaps<UniversalFlatFieldMetadata>;
-  shouldCheckRollupReferences: boolean;
 };
 
 export const validateFlatFieldMetadataIsNotReferencedByComputedField = ({
   flatFieldMetadataToMutate,
   flatFieldMetadataMaps,
-  shouldCheckRollupReferences,
 }: ValidateFlatFieldMetadataIsNotReferencedByComputedFieldArgs): FlatFieldMetadataValidationError[] => {
   const dependentComputedFieldNames = Object.values(
     flatFieldMetadataMaps.byUniversalIdentifier,
@@ -34,7 +31,6 @@ export const validateFlatFieldMetadataIsNotReferencedByComputedField = ({
       isComputedFlatFieldMetadataReferencingField({
         candidateFlatFieldMetadata,
         flatFieldMetadataToMutate,
-        shouldCheckRollupReferences,
       }),
     )
     .map((computedFlatFieldMetadata) => computedFlatFieldMetadata.name);
@@ -59,10 +55,9 @@ export const validateFlatFieldMetadataIsNotReferencedByComputedField = ({
 const isComputedFlatFieldMetadataReferencingField = ({
   candidateFlatFieldMetadata,
   flatFieldMetadataToMutate,
-  shouldCheckRollupReferences,
 }: Pick<
   ValidateFlatFieldMetadataIsNotReferencedByComputedFieldArgs,
-  'flatFieldMetadataToMutate' | 'shouldCheckRollupReferences'
+  'flatFieldMetadataToMutate'
 > & {
   candidateFlatFieldMetadata: UniversalFlatFieldMetadata;
 }): boolean => {
@@ -91,19 +86,6 @@ const isComputedFlatFieldMetadataReferencingField = ({
       expression: computedExpression,
       fieldName: flatFieldMetadataToMutate.name,
     });
-  }
-
-  if (
-    shouldCheckRollupReferences &&
-    candidateFlatFieldMetadata.type === FieldMetadataType.ROLLUP &&
-    'aggregateOperation' in universalSettings
-  ) {
-    return (
-      universalSettings.relationFieldMetadataUniversalIdentifier ===
-        flatFieldMetadataToMutate.universalIdentifier ||
-      universalSettings.targetFieldMetadataUniversalIdentifier ===
-        flatFieldMetadataToMutate.universalIdentifier
-    );
   }
 
   return false;

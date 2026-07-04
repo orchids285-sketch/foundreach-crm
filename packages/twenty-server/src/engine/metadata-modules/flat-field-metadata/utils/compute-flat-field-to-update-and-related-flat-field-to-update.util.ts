@@ -1,8 +1,4 @@
-import {
-  type FieldMetadataSettings,
-  FieldMetadataType,
-  type FromTo,
-} from 'twenty-shared/types';
+import { FieldMetadataType, type FromTo } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { type UpdateFieldInput } from 'src/engine/metadata-modules/field-metadata/dtos/update-field.input';
@@ -23,7 +19,6 @@ import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-fiel
 import { sanitizeRawUpdateFieldInput } from 'src/engine/metadata-modules/flat-field-metadata/utils/sanitize-raw-update-field-input';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { belongsToTwentyStandardApp } from 'src/engine/metadata-modules/utils/belongs-to-twenty-standard-app.util';
-import { convertChartFilterToUniversalChartFilter } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/utils/convert-chart-filter-to-universal-chart-filter.util';
 import { mergeUpdateInExistingRecord } from 'src/utils/merge-update-in-existing-record.util';
 
 type ComputeFlatFieldToUpdateAndRelatedFlatFieldToUpdateReturnType = {
@@ -40,60 +35,6 @@ type ComputeFlatFieldToUpdateAndRelatedFlatFieldToUpdateArgs = {
   flatObjectMetadata: FlatObjectMetadata;
   isSystemBuild: boolean;
 } & Pick<AllFlatEntityMaps, 'flatFieldMetadataMaps'>;
-const computeRollupUniversalSettingsFromSettingsOrThrow = ({
-  updatedSettings,
-  flatFieldMetadataMaps,
-}: {
-  updatedSettings: FieldMetadataSettings<FieldMetadataType.ROLLUP>;
-  flatFieldMetadataMaps: AllFlatEntityMaps['flatFieldMetadataMaps'];
-}): FlatFieldMetadata<FieldMetadataType.ROLLUP>['universalSettings'] => {
-  const relationFlatFieldMetadata = findFlatEntityByIdInFlatEntityMaps({
-    flatEntityId: updatedSettings.relationFieldMetadataId,
-    flatEntityMaps: flatFieldMetadataMaps,
-  });
-
-  if (!isDefined(relationFlatFieldMetadata)) {
-    throw new FlatEntityMapsException(
-      `Field metadata universal identifier not found for id: ${updatedSettings.relationFieldMetadataId}`,
-      FlatEntityMapsExceptionCode.RELATION_UNIVERSAL_IDENTIFIER_NOT_FOUND,
-    );
-  }
-
-  const targetFlatFieldMetadata = isDefined(
-    updatedSettings.targetFieldMetadataId,
-  )
-    ? findFlatEntityByIdInFlatEntityMaps({
-        flatEntityId: updatedSettings.targetFieldMetadataId,
-        flatEntityMaps: flatFieldMetadataMaps,
-      })
-    : null;
-
-  if (
-    isDefined(updatedSettings.targetFieldMetadataId) &&
-    !isDefined(targetFlatFieldMetadata)
-  ) {
-    throw new FlatEntityMapsException(
-      `Field metadata universal identifier not found for id: ${updatedSettings.targetFieldMetadataId}`,
-      FlatEntityMapsExceptionCode.RELATION_UNIVERSAL_IDENTIFIER_NOT_FOUND,
-    );
-  }
-
-  return {
-    aggregateOperation: updatedSettings.aggregateOperation,
-    relationFieldMetadataUniversalIdentifier:
-      relationFlatFieldMetadata.universalIdentifier,
-    targetFieldMetadataUniversalIdentifier:
-      targetFlatFieldMetadata?.universalIdentifier ?? null,
-    filter: convertChartFilterToUniversalChartFilter({
-      filter: updatedSettings.filter,
-      resolveFieldMetadataUniversalIdentifier: (fieldMetadataId) =>
-        findFlatEntityByIdInFlatEntityMaps({
-          flatEntityId: fieldMetadataId,
-          flatEntityMaps: flatFieldMetadataMaps,
-        })?.universalIdentifier ?? null,
-    }),
-  };
-};
 
 // Note: Standard override is way too complex we should land a smoother implemenentation once we standardize
 // them across every flat entities
@@ -159,15 +100,6 @@ export const computeFlatFieldToUpdateAndRelatedFlatFieldToUpdate = ({
         junctionTargetFieldUniversalIdentifier:
           junctionFlatFieldMetadata.universalIdentifier,
       };
-    } else if (
-      toFlatFieldMetadata.type === FieldMetadataType.ROLLUP &&
-      isFieldMetadataSettingsOfType(updatedSettings, FieldMetadataType.ROLLUP)
-    ) {
-      toFlatFieldMetadata.universalSettings =
-        computeRollupUniversalSettingsFromSettingsOrThrow({
-          updatedSettings,
-          flatFieldMetadataMaps,
-        });
     } else {
       toFlatFieldMetadata.universalSettings = updatedSettings;
     }

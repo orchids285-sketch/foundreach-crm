@@ -40,7 +40,6 @@ export const getFilterFilterableFieldMetadataItems = ({
       FieldMetadataType.ARRAY,
       FieldMetadataType.UUID,
       FieldMetadataType.FILES,
-      FieldMetadataType.ROLLUP,
       ...(isJsonFilterEnabled ? [FieldMetadataType.RAW_JSON] : []),
     ].includes(field.type);
 

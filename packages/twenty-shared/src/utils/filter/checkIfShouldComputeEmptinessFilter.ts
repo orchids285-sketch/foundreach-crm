@@ -28,7 +28,6 @@ export const checkIfShouldComputeEmptinessFilter = ({
 
   const filterType = getFilterTypeFromFieldType(
     correspondingFieldMetadataItem.type,
-    correspondingFieldMetadataItem.settings,
   );
 
   const filterHasEmptinessOperands =

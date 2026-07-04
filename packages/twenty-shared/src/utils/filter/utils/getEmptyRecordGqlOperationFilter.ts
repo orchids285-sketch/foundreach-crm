@@ -47,7 +47,6 @@ export const getEmptyRecordGqlOperationFilter = ({
 
   const filterType = getFilterTypeFromFieldType(
     correspondingField.type,
-    correspondingField.settings,
   );
 
   switch (filterType) {

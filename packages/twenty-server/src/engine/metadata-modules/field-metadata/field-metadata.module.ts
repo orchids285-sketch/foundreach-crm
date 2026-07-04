@@ -18,7 +18,6 @@ import { FieldMetadataController } from 'src/engine/metadata-modules/field-metad
 import { FieldMetadataDTO } from 'src/engine/metadata-modules/field-metadata/dtos/field-metadata.dto';
 import { FieldMetadataResolver } from 'src/engine/metadata-modules/field-metadata/field-metadata.resolver';
 import { FieldMetadataGraphqlApiExceptionInterceptor } from 'src/engine/metadata-modules/field-metadata/interceptors/field-metadata-graphql-api-exception.interceptor';
-import { RollupFieldEventsListener } from 'src/engine/metadata-modules/field-metadata/listeners/rollup-field-events.listener';
 import { FieldMetadataService } from 'src/engine/metadata-modules/field-metadata/services/field-metadata.service';
 import { FieldMetadataToolsFactory } from 'src/engine/metadata-modules/field-metadata/tools/field-metadata-tools.factory';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
@@ -103,7 +102,6 @@ import { UpdateFieldInput } from './dtos/update-field.input';
     FieldMetadataService,
     FieldMetadataResolver,
     FieldMetadataToolsFactory,
-    RollupFieldEventsListener,
   ],
   exports: [FieldMetadataService, FieldMetadataToolsFactory],
 })

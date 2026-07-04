@@ -39,25 +39,6 @@ const createComputedFlatFieldMetadata = ({
     universalSettings: { computedExpression },
   }) as UniversalFlatFieldMetadata;
 
-const createRollupFlatFieldMetadata = ({
-  relationFieldMetadataUniversalIdentifier,
-  targetFieldMetadataUniversalIdentifier = null,
-}: {
-  relationFieldMetadataUniversalIdentifier: string;
-  targetFieldMetadataUniversalIdentifier?: string | null;
-}): UniversalFlatFieldMetadata =>
-  ({
-    name: 'rollupField',
-    universalIdentifier: 'field-rollup',
-    objectMetadataUniversalIdentifier: OTHER_OBJECT_UNIVERSAL_IDENTIFIER,
-    type: FieldMetadataType.ROLLUP,
-    universalSettings: {
-      aggregateOperation: 'COUNT',
-      relationFieldMetadataUniversalIdentifier,
-      targetFieldMetadataUniversalIdentifier,
-    },
-  }) as UniversalFlatFieldMetadata;
-
 describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
   it('should return an error when a same-object formula references the field name', () => {
     const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
@@ -67,7 +48,6 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
           computedExpression: 'employees * 2',
         }),
       ]),
-      shouldCheckRollupReferences: true,
     });
 
     expect(errors).toHaveLength(1);
@@ -83,7 +63,6 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
           objectMetadataUniversalIdentifier: OTHER_OBJECT_UNIVERSAL_IDENTIFIER,
         }),
       ]),
-      shouldCheckRollupReferences: true,
     });
 
     expect(errors).toEqual([]);
@@ -95,7 +74,6 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
         createComputedFlatFieldMetadata({ computedExpression: 'revenue * 2' }),
       ]),
-      shouldCheckRollupReferences: true,
     });
 
     expect(errors).toEqual([]);
@@ -107,76 +85,32 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
         createComputedFlatFieldMetadata({ computedExpression: 'employees +' }),
       ]),
-      shouldCheckRollupReferences: true,
-    });
-
-    expect(errors).toEqual([]);
-  });
-
-  it('should return an error when a rollup references the field as its relation', () => {
-    const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
-      flatFieldMetadataToMutate: sourceFlatFieldMetadata,
-      flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createRollupFlatFieldMetadata({
-          relationFieldMetadataUniversalIdentifier:
-            sourceFlatFieldMetadata.universalIdentifier,
-        }),
-      ]),
-      shouldCheckRollupReferences: true,
-    });
-
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toContain('rollupField');
-  });
-
-  it('should return an error when a rollup references the field as its target', () => {
-    const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
-      flatFieldMetadataToMutate: sourceFlatFieldMetadata,
-      flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createRollupFlatFieldMetadata({
-          relationFieldMetadataUniversalIdentifier: 'field-unrelated',
-          targetFieldMetadataUniversalIdentifier:
-            sourceFlatFieldMetadata.universalIdentifier,
-        }),
-      ]),
-      shouldCheckRollupReferences: true,
-    });
-
-    expect(errors).toHaveLength(1);
-  });
-
-  it('should ignore rollup references when shouldCheckRollupReferences is false', () => {
-    const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
-      flatFieldMetadataToMutate: sourceFlatFieldMetadata,
-      flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createRollupFlatFieldMetadata({
-          relationFieldMetadataUniversalIdentifier:
-            sourceFlatFieldMetadata.universalIdentifier,
-        }),
-      ]),
-      shouldCheckRollupReferences: false,
     });
 
     expect(errors).toEqual([]);
   });
 
   it('should list every dependent computed field in one error', () => {
+    const otherComputedFlatFieldMetadata = {
+      ...createComputedFlatFieldMetadata({
+        computedExpression: 'employees * 3',
+      }),
+      name: 'otherComputedField',
+      universalIdentifier: 'field-other-computed',
+    } as UniversalFlatFieldMetadata;
+
     const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
       flatFieldMetadataToMutate: sourceFlatFieldMetadata,
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
         createComputedFlatFieldMetadata({
           computedExpression: 'employees + 1',
         }),
-        createRollupFlatFieldMetadata({
-          relationFieldMetadataUniversalIdentifier:
-            sourceFlatFieldMetadata.universalIdentifier,
-        }),
+        otherComputedFlatFieldMetadata,
       ]),
-      shouldCheckRollupReferences: true,
     });
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toContain('computedField');
-    expect(errors[0].message).toContain('rollupField');
+    expect(errors[0].message).toContain('otherComputedField');
   });
 });

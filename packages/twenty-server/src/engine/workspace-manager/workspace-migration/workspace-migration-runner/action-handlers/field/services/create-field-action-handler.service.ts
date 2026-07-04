@@ -12,12 +12,10 @@ import { type MetadataFlatEntityMaps } from 'src/engine/metadata-modules/flat-en
 import { findFlatEntityByIdInFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps-or-throw.util';
 import { findManyFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-many-flat-entity-by-id-in-flat-entity-maps.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
-import { buildRollupRecomputeSql } from 'src/engine/metadata-modules/flat-field-metadata/utils/build-rollup-recompute-sql.util';
 import { deriveComputedAsExpressionForFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-as-expression-for-flat-field-metadata.util';
 import { deriveComputedCurrencyCodeAsExpressionOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-currency-code-as-expression.util';
 import { getFlatFieldMetadataComputedExpression } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-flat-field-metadata-computed-expression.util';
 import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
-import { resolveRollupSqlContextOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/resolve-rollup-sql-context.util';
 import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
 import { WorkspaceSchemaManagerService } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.service';
@@ -249,38 +247,6 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       tableName,
       columnDefinitions,
     });
-
-    const isUnfilteredRollup =
-      isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.ROLLUP) &&
-      (flatFieldMetadata.settings.filter?.recordFilters?.length ?? 0) === 0;
-
-    // Filtered rollups are backfilled asynchronously after the migration
-    // commits, because filter resolution needs the ORM query machinery
-    if (isUnfilteredRollup) {
-      const {
-        rollupColumnName,
-        childTableName,
-        childJoinColumnName,
-        childTargetColumnName,
-        aggregateOperation,
-      } = resolveRollupSqlContextOrThrow({
-        rollupFlatFieldMetadata: flatFieldMetadata,
-        flatFieldMetadataMaps,
-        flatObjectMetadataMaps,
-      });
-
-      const { sql, parameters } = buildRollupRecomputeSql({
-        parentSchemaName: schemaName,
-        parentTableName: tableName,
-        rollupColumnName,
-        childTableName,
-        childJoinColumnName,
-        childTargetColumnName,
-        aggregateOperation,
-      });
-
-      await queryRunner.query(sql, parameters);
-    }
 
     if (
       isMorphOrRelationFlatFieldMetadata(flatFieldMetadata) &&

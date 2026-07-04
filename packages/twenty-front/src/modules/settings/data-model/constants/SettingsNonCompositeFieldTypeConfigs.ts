@@ -8,7 +8,6 @@ import {
   type FieldMultiSelectValue,
   type FieldNumberValue,
   type FieldRelationValue,
-  type FieldRollupValue,
   type FieldSelectValue,
   type FieldTextValue,
   type FieldUUidValue,
@@ -140,12 +139,6 @@ export const SETTINGS_NON_COMPOSITE_FIELD_TYPE_CONFIGS: SettingsNonCompositeFiel
       exampleValues: ['amount * 0.88', 'price * quantity', 'revenue - cost'],
       category: 'Advanced',
     } as const satisfies SettingsFieldTypeConfig<string>,
-    [FieldMetadataType.ROLLUP]: {
-      label: 'Rollup',
-      Icon: IllustrationIconNumbers,
-      exampleValues: [12, 3, 47],
-      category: 'Advanced',
-    } as const satisfies SettingsFieldTypeConfig<FieldRollupValue>,
     [FieldMetadataType.RAW_JSON]: {
       label: 'JSON',
       Icon: IllustrationIconJson,

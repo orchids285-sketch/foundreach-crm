@@ -12,10 +12,7 @@ export const useCreateEmptyRecordFilterFromFieldMetadataItem = () => {
   const createEmptyRecordFilterFromFieldMetadataItem = (
     fieldMetadataItem: FieldMetadataItem,
   ) => {
-    const filterType = getFilterTypeFromFieldType(
-      fieldMetadataItem.type,
-      fieldMetadataItem.settings,
-    );
+    const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type);
 
     const availableOperandsForFilter = getRecordFilterOperands({
       filterType,

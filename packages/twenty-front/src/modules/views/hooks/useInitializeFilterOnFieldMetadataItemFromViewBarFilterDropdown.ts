@@ -71,10 +71,7 @@ export const useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown =
             currentRecordFiltersCallbackState,
           );
 
-          const filterType = getFilterTypeFromFieldType(
-            fieldMetadataItem.type,
-            fieldMetadataItem.settings,
-          );
+          const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type);
 
           if (filterType === 'RELATION' || filterType === 'SELECT') {
             pushFocusItemToFocusStack({

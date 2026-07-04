@@ -2,19 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { TypeOrmQueryService } from '@ptc-org/nestjs-query-typeorm';
-import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { type FindOneOptions, type Repository } from 'typeorm';
 
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { type FlatApplication } from 'src/engine/core-modules/application/types/flat-application.type';
-import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
-import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
-import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
-import {
-  RecomputeRollupFieldsJob,
-  type RecomputeRollupFieldsJobData,
-} from 'src/engine/metadata-modules/field-metadata/jobs/recompute-rollup-fields.job';
 import { type CreateFieldInput } from 'src/engine/metadata-modules/field-metadata/dtos/create-field.input';
 import { type DeleteOneFieldInput } from 'src/engine/metadata-modules/field-metadata/dtos/delete-field.input';
 import { type UpdateFieldInput } from 'src/engine/metadata-modules/field-metadata/dtos/update-field.input';
@@ -31,7 +23,6 @@ import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-m
 import { fromCreateFieldInputToFlatFieldMetadatasToCreate } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-create-field-input-to-flat-field-metadatas-to-create.util';
 import { fromDeleteFieldInputToFlatFieldMetadatasToDelete } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-delete-field-input-to-flat-field-metadatas-to-delete.util';
 import { fromUpdateFieldInputToFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-update-field-input-to-flat-field-metadata.util';
-import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
 import { throwOnFieldInputTranspilationsError } from 'src/engine/metadata-modules/flat-field-metadata/utils/throw-on-field-input-transpilations-error.util';
 import { computeFlatViewFieldsFromFieldsWidgets } from 'src/engine/metadata-modules/flat-view-field/utils/compute-flat-view-fields-from-fields-widgets.util';
 import { WidgetConfigurationType } from 'src/engine/metadata-modules/page-layout-widget/enums/widget-configuration-type.type';
@@ -50,41 +41,8 @@ export class FieldMetadataService extends TypeOrmQueryService<FieldMetadataEntit
     private readonly workspaceMigrationValidateBuildAndRunService: WorkspaceMigrationValidateBuildAndRunService,
     private readonly applicationService: ApplicationService,
     private readonly workspaceCacheService: WorkspaceCacheService,
-    @InjectMessageQueue(MessageQueue.workspaceQueue)
-    private readonly workspaceQueueService: MessageQueueService,
   ) {
     super(fieldMetadataRepository);
-  }
-
-  private async enqueueFilteredRollupBackfill({
-    workspaceId,
-    flatFieldMetadatas,
-  }: {
-    workspaceId: string;
-    flatFieldMetadatas: FlatFieldMetadata[];
-  }): Promise<void> {
-    for (const flatFieldMetadata of flatFieldMetadatas) {
-      if (
-        !isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.ROLLUP)
-      ) {
-        continue;
-      }
-
-      if (
-        (flatFieldMetadata.settings.filter?.recordFilters?.length ?? 0) === 0
-      ) {
-        continue;
-      }
-
-      await this.workspaceQueueService.add<RecomputeRollupFieldsJobData>(
-        RecomputeRollupFieldsJob.name,
-        {
-          workspaceId,
-          rollupFieldMetadataId: flatFieldMetadata.id,
-        },
-        { retryLimit: 3 },
-      );
-    }
   }
 
   async createOneField({
@@ -398,13 +356,6 @@ export class FieldMetadataService extends TypeOrmQueryService<FieldMetadataEntit
       },
     );
 
-    if (isDefined(updateFieldInput.settings)) {
-      await this.enqueueFilteredRollupBackfill({
-        workspaceId,
-        flatFieldMetadatas: [updatedFlatFieldMetadata],
-      });
-    }
-
     return updatedFlatFieldMetadata;
   }
 
@@ -547,11 +498,6 @@ export class FieldMetadataService extends TypeOrmQueryService<FieldMetadataEntit
         ),
         flatEntityMaps: recomputedFlatFieldMetadataMaps,
       });
-
-    await this.enqueueFilteredRollupBackfill({
-      workspaceId,
-      flatFieldMetadatas: createdFlatFieldMetadatas,
-    });
 
     return createdFlatFieldMetadatas;
   }

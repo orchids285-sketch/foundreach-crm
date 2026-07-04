@@ -22,7 +22,6 @@ export const DEFAULT_ICONS_BY_FIELD_TYPE: Record<
   [FieldMetadataType.RAW_JSON]: 'IconBraces',
   [FieldMetadataType.RELATION]: 'IconRelationOneToMany',
   [FieldMetadataType.MORPH_RELATION]: 'IconRelationOneToMany',
-  [FieldMetadataType.ROLLUP]: 'IconSum',
   [FieldMetadataType.SELECT]: 'IconTag',
   [FieldMetadataType.TEXT]: 'IconTypography',
   [FieldMetadataType.UUID]: 'IconId',

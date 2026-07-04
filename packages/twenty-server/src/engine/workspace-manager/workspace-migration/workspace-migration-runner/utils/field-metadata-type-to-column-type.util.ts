@@ -24,7 +24,6 @@ export const fieldMetadataTypeToColumnType = <Type extends FieldMetadataType>(
       return 'numeric';
     case FieldMetadataType.NUMBER:
     case FieldMetadataType.POSITION:
-    case FieldMetadataType.ROLLUP:
       return 'float';
     case FieldMetadataType.BOOLEAN:
       return 'boolean';

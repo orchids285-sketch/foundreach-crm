@@ -19,7 +19,6 @@ import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/
 import { type FieldInputTranspilationResult } from 'src/engine/metadata-modules/flat-field-metadata/types/field-input-transpilation-result.type';
 import { fromMorphRelationCreateFieldInputToFlatFieldMetadatas } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-morph-relation-create-field-input-to-flat-field-metadatas.util';
 import { fromRelationCreateFieldInputToFlatFieldMetadatas } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-relation-create-field-input-to-flat-field-metadatas.util';
-import { fromRollupCreateFieldInputToFlatFieldMetadatas } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-rollup-create-field-input-to-flat-field-metadatas.util';
 import { getDefaultFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-default-flat-field-metadata-from-create-field-input.util';
 import { type UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
 import { type UniversalFlatIndexMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-index-metadata.type';
@@ -155,16 +154,6 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
           indexMetadatas: [],
         },
       };
-    }
-    case FieldMetadataType.ROLLUP: {
-      return fromRollupCreateFieldInputToFlatFieldMetadatas({
-        createFieldInput: {
-          ...createFieldInput,
-          type: createFieldInput.type,
-        },
-        commonFlatFieldMetadata,
-        existingFlatFieldMetadataMaps,
-      });
     }
     case FieldMetadataType.TS_VECTOR: {
       return {

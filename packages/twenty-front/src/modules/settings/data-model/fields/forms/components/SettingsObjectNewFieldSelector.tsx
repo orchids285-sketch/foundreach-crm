@@ -87,9 +87,7 @@ export const SettingsObjectNewFieldSelector = ({
   ).filter(
     ([key, config]) =>
       !excludedFieldTypes.includes(key as FieldType) &&
-      ((key !== SETTINGS_FIELD_TYPE_FORMULA &&
-        key !== FieldMetadataType.ROLLUP) ||
-        isFormulaFieldsEnabled) &&
+      (key !== SETTINGS_FIELD_TYPE_FORMULA || isFormulaFieldsEnabled) &&
       config.label.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 

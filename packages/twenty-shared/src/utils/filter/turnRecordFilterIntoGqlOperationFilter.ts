@@ -208,7 +208,6 @@ const buildDirectFieldGqlOperationFilter = ({
 
   const filterType = getFilterTypeFromFieldType(
     fieldMetadataItem.type,
-    fieldMetadataItem.settings,
   );
 
   switch (filterType) {

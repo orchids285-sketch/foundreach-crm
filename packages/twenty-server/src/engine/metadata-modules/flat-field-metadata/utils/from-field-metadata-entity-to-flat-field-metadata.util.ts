@@ -5,7 +5,6 @@ import { isFieldMetadataSettingsOfType } from 'src/engine/metadata-modules/field
 import { fromEntityToScalarEntity } from 'src/engine/metadata-modules/flat-entity/utils/from-entity-to-scalar-entity.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type FromEntityToFlatEntityArgs } from 'src/engine/workspace-cache/types/from-entity-to-flat-entity-args.type';
-import { convertChartFilterToUniversalChartFilter } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/utils/convert-chart-filter-to-universal-chart-filter.util';
 import { resolveManyToOneRelationIdsToUniversalIdentifiers } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/utils/resolve-many-to-one-relation-ids-to-universal-identifiers.util';
 
 const computeUniversalSettingsFromEntitySettings = ({
@@ -35,31 +34,6 @@ const computeUniversalSettingsFromEntitySettings = ({
           fieldMetadataIdToUniversalIdentifierMap.get(
             settings.junctionTargetFieldId,
           ),
-      }),
-    };
-  }
-
-  if (
-    fieldMetadataEntity.type === FieldMetadataType.ROLLUP &&
-    isFieldMetadataSettingsOfType(settings, FieldMetadataType.ROLLUP)
-  ) {
-    return {
-      aggregateOperation: settings.aggregateOperation,
-      relationFieldMetadataUniversalIdentifier:
-        fieldMetadataIdToUniversalIdentifierMap.get(
-          settings.relationFieldMetadataId,
-        ) ?? null,
-      targetFieldMetadataUniversalIdentifier: isDefined(
-        settings.targetFieldMetadataId,
-      )
-        ? (fieldMetadataIdToUniversalIdentifierMap.get(
-            settings.targetFieldMetadataId,
-          ) ?? null)
-        : null,
-      filter: convertChartFilterToUniversalChartFilter({
-        filter: settings.filter,
-        resolveFieldMetadataUniversalIdentifier: (fieldMetadataId) =>
-          fieldMetadataIdToUniversalIdentifierMap.get(fieldMetadataId) ?? null,
       }),
     };
   }

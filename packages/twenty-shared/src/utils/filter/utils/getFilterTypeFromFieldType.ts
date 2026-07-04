@@ -1,12 +1,10 @@
 import {
-  type AllFieldMetadataSettings,
   FieldMetadataType,
   type FilterableAndTSVectorFieldType,
 } from '@/types';
 
 export const getFilterTypeFromFieldType = (
   fieldType: FieldMetadataType,
-  _fieldSettings?: AllFieldMetadataSettings | null,
 ): FilterableAndTSVectorFieldType => {
   switch (fieldType) {
     case FieldMetadataType.DATE_TIME:
@@ -18,8 +16,6 @@ export const getFilterTypeFromFieldType = (
     case FieldMetadataType.FULL_NAME:
       return 'FULL_NAME';
     case FieldMetadataType.NUMBER:
-      return 'NUMBER';
-    case FieldMetadataType.ROLLUP:
       return 'NUMBER';
     case FieldMetadataType.CURRENCY:
       return 'CURRENCY';

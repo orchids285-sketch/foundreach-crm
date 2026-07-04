@@ -25,7 +25,6 @@ export const getOperatorsForFieldType = (
     case FieldMetadataType.NUMBER:
     case FieldMetadataType.NUMERIC:
     case FieldMetadataType.POSITION:
-    case FieldMetadataType.ROLLUP:
       return NUMBER_FILTER_OPERATORS;
 
     case FieldMetadataType.BOOLEAN:

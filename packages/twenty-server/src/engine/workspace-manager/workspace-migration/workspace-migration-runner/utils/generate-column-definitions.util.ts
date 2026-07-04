@@ -121,19 +121,6 @@ const generateComputedColumnDefinition = ({
   };
 };
 
-const generateRollupColumnDefinition = (
-  flatFieldMetadata: FlatFieldMetadata<FieldMetadataType.ROLLUP>,
-): WorkspaceSchemaColumnDefinition => {
-  return {
-    name: computeColumnName(flatFieldMetadata.name),
-    type: 'float',
-    isNullable: true,
-    isArray: false,
-    default: null,
-    isPrimary: false,
-  };
-};
-
 const generateTsVectorColumnDefinition = (
   flatFieldMetadata: FlatFieldMetadata<FieldMetadataType.TS_VECTOR>,
   searchVectorAsExpression?: string,
@@ -274,10 +261,6 @@ export const generateColumnDefinitions = ({
         computedAsExpression,
       }),
     ];
-  }
-
-  if (isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.ROLLUP)) {
-    return [generateRollupColumnDefinition(flatFieldMetadata)];
   }
 
   if (

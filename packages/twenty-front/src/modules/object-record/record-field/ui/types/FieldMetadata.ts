@@ -6,7 +6,6 @@ import {
   ConnectedAccountProvider,
   type AllowedAddressSubField,
   type FieldMetadataMultiItemSettings,
-  type FieldMetadataRollupSettings,
   type FileCategory,
 } from 'twenty-shared/types';
 import { type ThemeColor } from 'twenty-ui/theme';
@@ -204,10 +203,6 @@ export type FieldFilesMetadata = BaseFieldMetadata & {
   settings?: FieldMetadataMultiItemSettings | null;
 };
 
-export type FieldRollupMetadata = BaseFieldMetadata & {
-  settings?: FieldMetadataRollupSettings | null;
-};
-
 export type FieldMetadata =
   | FieldBooleanMetadata
   | FieldCurrencyMetadata
@@ -216,7 +211,6 @@ export type FieldMetadata =
   | FieldEmailMetadata
   | FieldEmailsMetadata
   | FieldFilesMetadata
-  | FieldRollupMetadata
   | FieldFullNameMetadata
   | FieldLinkMetadata
   | FieldLinksMetadata
@@ -243,7 +237,6 @@ export type FieldDateTimeValue = string | null;
 export type FieldDateValue = string | null;
 export type FieldNumberValue = number | null;
 export type FieldBooleanValue = boolean;
-export type FieldRollupValue = number | null;
 
 export type FieldEmailsValue = {
   primaryEmail: string;

@@ -25,10 +25,7 @@ export const convertPredicateToRecordFilter = (
     return null;
   }
 
-  const filterType = getFilterTypeFromFieldType(
-    fieldMetadataItem.type,
-    fieldMetadataItem.settings,
-  );
+  const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type);
 
   const valueString =
     typeof predicate.value === 'string'
