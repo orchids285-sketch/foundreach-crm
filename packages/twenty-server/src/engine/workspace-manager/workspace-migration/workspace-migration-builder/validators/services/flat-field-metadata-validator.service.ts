@@ -13,6 +13,7 @@ import { FlatFieldMetadataTypeValidatorService } from 'src/engine/metadata-modul
 import { FlatFieldMetadataRelationPropertiesToCompare } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata-relation-properties-to-compare.type';
 import { isFlatFieldMetadataNameSyncedWithLabel } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-name-synced-with-label.util';
 import { isMorphOrRelationUniversalFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
+import { validateFlatFieldMetadataIsNotReferencedByComputedField } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-is-not-referenced-by-computed-field.util';
 import { validateFlatFieldMetadataNameAvailability } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-name-availability.util';
 import { validateFlatFieldMetadataName } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-name.util';
 import { UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
@@ -163,6 +164,11 @@ export class FlatFieldMetadataValidatorService {
     ///
 
     if (isDefined(flatEntityUpdate.name)) {
+      const previousFlatFieldMetadata = findFlatEntityByUniversalIdentifier({
+        universalIdentifier: flatFieldMetadataToValidate.universalIdentifier,
+        flatEntityMaps: optimisticFlatFieldMetadataMaps,
+      });
+
       validationResult.errors.push(
         ...validateFlatFieldMetadataName({
           name: flatFieldMetadataToValidate.name,
@@ -173,6 +179,16 @@ export class FlatFieldMetadataValidatorService {
           universalFlatFieldMetadataMaps: optimisticFlatFieldMetadataMaps,
           universalFlatObjectMetadata: flatObjectMetadata,
           buildOptions,
+        }),
+        ...validateFlatFieldMetadataIsNotReferencedByComputedField({
+          flatFieldMetadataToMutate: {
+            ...flatFieldMetadataToValidate,
+            name:
+              previousFlatFieldMetadata?.name ??
+              flatFieldMetadataToValidate.name,
+          },
+          flatFieldMetadataMaps: optimisticFlatFieldMetadataMaps,
+          shouldCheckRollupReferences: false,
         }),
       );
     }
@@ -299,6 +315,16 @@ export class FlatFieldMetadataValidatorService {
           'Cannot delete, please update the label identifier field first',
         userFriendlyMessage: msg`Cannot delete, please update the label identifier field first`,
       });
+    }
+
+    if (!parentObjectMetadataHasBeenDeleted) {
+      validationResult.errors.push(
+        ...validateFlatFieldMetadataIsNotReferencedByComputedField({
+          flatFieldMetadataToMutate: flatFieldMetadataToDelete,
+          flatFieldMetadataMaps: optimisticFlatFieldMetadataMaps,
+          shouldCheckRollupReferences: true,
+        }),
+      );
     }
 
     return validationResult;

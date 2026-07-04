@@ -1,4 +1,6 @@
+import { evaluateFormulaNumericAggregate } from '@/utils/formula/utils/evaluateFormulaNumericAggregate';
 import { inferNumericFunctionReturnTypeOrThrow } from '@/utils/formula/utils/inferNumericFunctionReturnTypeOrThrow';
+import { inferVariadicNumericFunctionReturnTypeOrThrow } from '@/utils/formula/utils/inferVariadicNumericFunctionReturnTypeOrThrow';
 import { roundHalfAwayFromZero } from '@/utils/formula/utils/roundHalfAwayFromZero';
 import { type FormulaFunctionDefinition } from '@/utils/formula/types/FormulaFunctionDefinition';
 
@@ -54,5 +56,27 @@ export const FORMULA_NUMERIC_FUNCTIONS: Record<
     toPostgresSql: ([valueSql]) => `CEIL(${valueSql})`,
     evaluate: ([value]) =>
       typeof value === 'number' ? Math.ceil(value) : null,
+  },
+  MIN: {
+    inferReturnTypeOrThrow: (argumentTypes) =>
+      inferVariadicNumericFunctionReturnTypeOrThrow({
+        functionName: 'MIN',
+        argumentTypes,
+      }),
+    toPostgresSql: (argumentsSql) => `LEAST(${argumentsSql.join(', ')})`,
+    // LEAST ignores null arguments and is null only when every argument is null.
+    evaluate: (argumentValues) =>
+      evaluateFormulaNumericAggregate({ argumentValues, aggregate: Math.min }),
+  },
+  MAX: {
+    inferReturnTypeOrThrow: (argumentTypes) =>
+      inferVariadicNumericFunctionReturnTypeOrThrow({
+        functionName: 'MAX',
+        argumentTypes,
+      }),
+    toPostgresSql: (argumentsSql) => `GREATEST(${argumentsSql.join(', ')})`,
+    // GREATEST ignores null arguments and is null only when every argument is null.
+    evaluate: (argumentValues) =>
+      evaluateFormulaNumericAggregate({ argumentValues, aggregate: Math.max }),
   },
 };

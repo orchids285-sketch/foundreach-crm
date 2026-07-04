@@ -206,7 +206,10 @@ const buildDirectFieldGqlOperationFilter = ({
 
   const isSubFieldFilter = isNonEmptyString(subFieldName);
 
-  const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type, fieldMetadataItem.settings);
+  const filterType = getFilterTypeFromFieldType(
+    fieldMetadataItem.type,
+    fieldMetadataItem.settings,
+  );
 
   switch (filterType) {
     case 'TEXT':

@@ -121,6 +121,7 @@ export const inferFormulaReturnTypeOrThrow = ({
 
         return functionDefinition.inferReturnTypeOrThrow(
           currentNode.arguments.map(inferNodeType),
+          currentNode.arguments,
         );
       }
     }

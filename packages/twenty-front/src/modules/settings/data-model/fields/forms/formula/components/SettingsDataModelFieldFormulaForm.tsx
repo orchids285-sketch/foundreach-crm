@@ -1,12 +1,16 @@
+import { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useFieldMetadataItemById } from '@/object-metadata/hooks/useFieldMetadataItemById';
+import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { Separator } from '@/settings/components/Separator';
 import { SettingsOptionCardContentSelect } from '@/settings/components/SettingsOptions/SettingsOptionCardContentSelect';
+import { SettingsDataModelFieldFormulaExpressionEditor } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaExpressionEditor';
+import { SettingsDataModelFieldFormulaPreview } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaPreview';
 import { FORMULA_DATA_MODEL_SELECT_OPTIONS } from '@/settings/data-model/fields/forms/formula/constants/FormulaDataModelSelectOptions';
+import { buildFormulaFieldReferenceTypes } from '@/settings/data-model/fields/forms/formula/utils/buildFormulaFieldReferenceTypes';
 import { Select } from '@/ui/input/components/Select';
-import { TextArea } from '@/ui/input/components/TextArea';
 import { useLingui } from '@lingui/react/macro';
 import {
   FORMULA_OUTPUT_TYPES,
@@ -44,17 +48,32 @@ export type SettingsDataModelFieldFormulaFormValues = z.infer<
 type SettingsDataModelFieldFormulaFormProps = {
   disabled?: boolean;
   existingFieldMetadataId: string;
+  objectNameSingular: string;
 };
 
 export const SettingsDataModelFieldFormulaForm = ({
   disabled,
   existingFieldMetadataId,
+  objectNameSingular,
 }: SettingsDataModelFieldFormulaFormProps) => {
   const { t } = useLingui();
   const { control } = useFormContext<SettingsDataModelFieldFormulaFormValues>();
 
   const { fieldMetadataItem } = useFieldMetadataItemById(
     existingFieldMetadataId,
+  );
+
+  const { objectMetadataItem } = useObjectMetadataItem({ objectNameSingular });
+
+  const fieldReferenceTypes = useMemo(
+    () =>
+      buildFormulaFieldReferenceTypes({
+        fieldMetadataItems: objectMetadataItem.fields.filter(
+          (siblingFieldMetadataItem) =>
+            siblingFieldMetadataItem.id !== existingFieldMetadataId,
+        ),
+      }),
+    [objectMetadataItem, existingFieldMetadataId],
   );
 
   return (
@@ -93,14 +112,18 @@ export const SettingsDataModelFieldFormulaForm = ({
               />
             </SettingsOptionCardContentSelect>
             <Separator />
-            <TextArea
-              textAreaId="formula-expression"
-              placeholder={t`E.g. amount * 0.88`}
-              minRows={4}
-              maxRows={8}
-              value={expression}
-              onChange={(value) => onChange({ expression: value, outputType })}
+            <SettingsDataModelFieldFormulaExpressionEditor
+              expression={expression}
+              outputType={outputType}
+              fieldReferenceTypes={fieldReferenceTypes}
+              onChange={(newExpression) =>
+                onChange({ expression: newExpression, outputType })
+              }
               disabled={disabled}
+            />
+            <SettingsDataModelFieldFormulaPreview
+              objectNameSingular={objectNameSingular}
+              expression={expression}
             />
           </>
         );

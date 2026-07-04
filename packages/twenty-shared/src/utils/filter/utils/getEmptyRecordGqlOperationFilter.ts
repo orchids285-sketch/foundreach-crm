@@ -45,7 +45,10 @@ export const getEmptyRecordGqlOperationFilter = ({
 
   const isSubFieldFilter = isNonEmptyString(compositeFieldName);
 
-  const filterType = getFilterTypeFromFieldType(correspondingField.type, correspondingField.settings);
+  const filterType = getFilterTypeFromFieldType(
+    correspondingField.type,
+    correspondingField.settings,
+  );
 
   switch (filterType) {
     case 'TEXT':

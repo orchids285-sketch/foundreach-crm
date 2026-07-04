@@ -236,7 +236,13 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       columnDefinitions,
     });
 
-    if (isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.ROLLUP)) {
+    const isUnfilteredRollup =
+      isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.ROLLUP) &&
+      (flatFieldMetadata.settings.filter?.recordFilters?.length ?? 0) === 0;
+
+    // Filtered rollups are backfilled asynchronously after the migration
+    // commits, because filter resolution needs the ORM query machinery
+    if (isUnfilteredRollup) {
       const {
         rollupColumnName,
         childTableName,

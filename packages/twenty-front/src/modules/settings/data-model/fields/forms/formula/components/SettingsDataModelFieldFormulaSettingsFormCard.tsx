@@ -35,6 +35,7 @@ export const SettingsDataModelFieldFormulaSettingsFormCard = ({
         <SettingsDataModelFieldFormulaForm
           disabled={disabled}
           existingFieldMetadataId={existingFieldMetadataId}
+          objectNameSingular={objectNameSingular}
         />
       }
     />

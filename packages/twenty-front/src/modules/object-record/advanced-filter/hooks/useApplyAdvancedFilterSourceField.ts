@@ -63,7 +63,10 @@ export const useApplyAdvancedFilterSourceField = () => {
   }: ApplyAdvancedFilterSourceFieldParams) => {
     setFieldMetadataItemIdUsedInDropdown(sourceFieldMetadataItem.id);
 
-    const filterType = getFilterTypeFromFieldType(sourceFieldMetadataItem.type, sourceFieldMetadataItem.settings);
+    const filterType = getFilterTypeFromFieldType(
+      sourceFieldMetadataItem.type,
+      sourceFieldMetadataItem.settings,
+    );
 
     const defaultOperand = getDefaultAdvancedFilterOperand({
       filterType,

@@ -29,6 +29,10 @@ describe('inferFormulaReturnTypeOrThrow', () => {
     ['BLANKVALUE(name, "unknown")', 'TEXT'],
     ['IF(isActive, NULL, amount)', 'NUMBER'],
     ['NOT isActive', 'BOOLEAN'],
+    ['SWITCH(name, "small", 1, "large", 2, 0)', 'NUMBER'],
+    ['MIN(amount, revenue.amountMicros, 0)', 'NUMBER'],
+    ['DATE_ADD(createdAt, 2, "days")', 'DATE_TIME'],
+    ['YEAR(createdAt)', 'NUMBER'],
   ] as const)('should infer %p as %s', (expression, expectedType) => {
     expect(inferType(expression)).toBe(expectedType);
   });
@@ -41,6 +45,11 @@ describe('inferFormulaReturnTypeOrThrow', () => {
     ['isActive > amount', 'boolean compared with number'],
     ['NOT amount', 'NOT on a number'],
     ['ROUND(name, 2)', 'text passed to ROUND'],
+    ['SWITCH(name, 1, "a")', 'case type mismatched with expression'],
+    ['SWITCH(name, "small", 1, "large", "b")', 'mismatched SWITCH values'],
+    ['MIN(amount, name)', 'text passed to MIN'],
+    ['DATE_ADD(createdAt, 2, name)', 'non-literal DATE_ADD unit'],
+    ['DATE_ADD(createdAt, 2, "decades")', 'unknown DATE_ADD unit'],
   ])('should reject %p (%s)', (invalidExpression) => {
     expect(() => inferType(invalidExpression)).toThrow();
   });

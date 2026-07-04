@@ -1,4 +1,5 @@
 import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
+import { type ChartFilter } from '@/types/page-layout/chart-filter.type';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
 import { type FormulaOutputType } from '@/types/FormulaOutputType';
@@ -70,9 +71,10 @@ export type FieldMetadataFormulaSettings = {
 };
 
 export type FieldMetadataRollupSettings = {
-  relationFieldMetadataId: string;
-  targetFieldMetadataId: string | null;
+  relationFieldMetadataId: SerializedRelation;
+  targetFieldMetadataId: SerializedRelation | null;
   aggregateOperation: RollupAggregateOperation;
+  filter?: ChartFilter | null;
 };
 
 export type FieldMetadataSettingsMapping = {

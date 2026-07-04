@@ -64,7 +64,7 @@ describe('transpileFormulaToPostgresExpressionOrThrow', () => {
 
   it('should transpile date difference to an epoch subtraction', () => {
     expect(transpile('DAYS_BETWEEN(closedAt, createdAt)')).toBe(
-      '((EXTRACT(EPOCH FROM ("closedAt")) - EXTRACT(EPOCH FROM ("createdAt"))) / 86400.0)',
+      '((EXTRACT(EPOCH FROM (("closedAt") AT TIME ZONE \'UTC\')) - EXTRACT(EPOCH FROM (("createdAt") AT TIME ZONE \'UTC\'))) / 86400.0)',
     );
   });
 

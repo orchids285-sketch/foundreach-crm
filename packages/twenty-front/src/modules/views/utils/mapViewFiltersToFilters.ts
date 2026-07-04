@@ -50,8 +50,14 @@ export const mapViewFiltersToFilters = (
       }
 
       const filterType = isDefined(relationTargetFieldMetadataItem)
-        ? getFilterTypeFromFieldType(relationTargetFieldMetadataItem.type, relationTargetFieldMetadataItem.settings)
-        : getFilterTypeFromFieldType(sourceFieldMetadataItem.type, sourceFieldMetadataItem.settings);
+        ? getFilterTypeFromFieldType(
+            relationTargetFieldMetadataItem.type,
+            relationTargetFieldMetadataItem.settings,
+          )
+        : getFilterTypeFromFieldType(
+            sourceFieldMetadataItem.type,
+            sourceFieldMetadataItem.settings,
+          );
 
       const label = isSystemSearchVectorField(sourceFieldMetadataItem.name)
         ? 'Search'

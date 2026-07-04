@@ -75,7 +75,10 @@ export const useRecordLevelPermissionFilterActions = ({
         firstField.label.localeCompare(secondField.label),
       )
       .filter((fieldMetadataItem) => {
-        const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type, fieldMetadataItem.settings);
+        const filterType = getFilterTypeFromFieldType(
+          fieldMetadataItem.type,
+          fieldMetadataItem.settings,
+        );
 
         return !isCompositeFieldType(filterType);
       });

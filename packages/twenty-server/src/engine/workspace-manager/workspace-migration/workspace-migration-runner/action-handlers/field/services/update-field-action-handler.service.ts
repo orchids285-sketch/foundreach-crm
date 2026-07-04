@@ -395,12 +395,16 @@ export class UpdateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       });
     }
 
+    // Filtered rollups are backfilled asynchronously after the migration
+    // commits, because filter resolution needs the ORM query machinery
     if (
       update.settings !== undefined &&
       isFlatFieldMetadataOfType(
         optimisticFlatFieldMetadata,
         FieldMetadataType.ROLLUP,
-      )
+      ) &&
+      (optimisticFlatFieldMetadata.settings.filter?.recordFilters?.length ??
+        0) === 0
     ) {
       const {
         rollupColumnName,

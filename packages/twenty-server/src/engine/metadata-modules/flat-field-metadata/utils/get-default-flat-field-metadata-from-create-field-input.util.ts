@@ -9,6 +9,7 @@ import { type CreateFieldInput } from 'src/engine/metadata-modules/field-metadat
 import { generateDefaultValue } from 'src/engine/metadata-modules/field-metadata/utils/generate-default-value';
 import { generateNullable } from 'src/engine/metadata-modules/field-metadata/utils/generate-nullable';
 import { isCompositeFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/utils/is-composite-field-metadata-type.util';
+import { fromFieldMetadataInputSettingsToUniversalSettings } from 'src/engine/metadata-modules/flat-field-metadata/utils/from-field-metadata-input-settings-to-universal-settings.util';
 import { nullifyEmptyCompositeDefaultValue } from 'src/engine/metadata-modules/flat-field-metadata/utils/nullify-empty-composite-default-value.util';
 import { type UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
 
@@ -75,7 +76,7 @@ export const getDefaultFlatFieldMetadata = ({
     kanbanAggregateOperationViewUniversalIdentifiers: [],
     calendarViewUniversalIdentifiers: [],
     mainGroupByFieldMetadataViewUniversalIdentifiers: [],
-    universalSettings: settings ?? null,
+    universalSettings: fromFieldMetadataInputSettingsToUniversalSettings(settings),
     viewSortUniversalIdentifiers: [],
     searchFieldMetadataUniversalIdentifiers: [],
   } as const satisfies UniversalFlatFieldMetadata;

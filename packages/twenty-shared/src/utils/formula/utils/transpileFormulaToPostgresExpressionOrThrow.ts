@@ -90,6 +90,7 @@ export const transpileFormulaToPostgresExpressionOrThrow = ({
         return functionDefinition.toPostgresSql(
           currentNode.arguments.map(transpileNode),
           argumentTypes,
+          currentNode.arguments,
         );
       }
     }

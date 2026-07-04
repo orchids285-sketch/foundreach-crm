@@ -1,3 +1,4 @@
+import { assertFormulaArgumentCountOrThrow } from '@/utils/formula/utils/assertFormulaArgumentCountOrThrow';
 import { assertFormulaArgumentTypeOrThrow } from '@/utils/formula/utils/assertFormulaArgumentTypeOrThrow';
 import { computePostgresLeftSlice } from '@/utils/formula/utils/computePostgresLeftSlice';
 import { computePostgresRightSlice } from '@/utils/formula/utils/computePostgresRightSlice';
@@ -104,6 +105,44 @@ export const FORMULA_TEXT_FUNCTIONS: Record<string, FormulaFunctionDefinition> =
         }
 
         return computePostgresRightSlice({ text: value, characterCount });
+      },
+    },
+    REPLACE: {
+      inferReturnTypeOrThrow: (argumentTypes) => {
+        assertFormulaArgumentCountOrThrow({
+          functionName: 'REPLACE',
+          expectedCount: 3,
+          actualCount: argumentTypes.length,
+        });
+
+        argumentTypes.forEach((argumentType, argumentIndex) =>
+          assertFormulaArgumentTypeOrThrow({
+            functionName: 'REPLACE',
+            argumentIndex,
+            actualType: argumentType,
+            expectedType: 'TEXT',
+          }),
+        );
+
+        return 'TEXT';
+      },
+      toPostgresSql: ([valueSql, searchSql, replacementSql]) =>
+        `REPLACE(${valueSql}, ${searchSql}, ${replacementSql})`,
+      evaluate: ([value, search, replacement]) => {
+        if (
+          typeof value !== 'string' ||
+          typeof search !== 'string' ||
+          typeof replacement !== 'string'
+        ) {
+          return null;
+        }
+
+        // Postgres REPLACE leaves the text unchanged for an empty search string.
+        if (search === '') {
+          return value;
+        }
+
+        return value.split(search).join(replacement);
       },
     },
     LENGTH: {

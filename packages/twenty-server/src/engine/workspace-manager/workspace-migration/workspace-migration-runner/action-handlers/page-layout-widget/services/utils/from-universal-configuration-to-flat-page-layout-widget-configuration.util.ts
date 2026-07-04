@@ -12,6 +12,7 @@ import { type MetadataFlatEntityMaps } from 'src/engine/metadata-modules/flat-en
 import { findFlatEntityByUniversalIdentifier } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-universal-identifier.util';
 import { type FlatPageLayoutWidget } from 'src/engine/metadata-modules/flat-page-layout-widget/types/flat-page-layout-widget.type';
 import { WidgetConfigurationType } from 'src/engine/metadata-modules/page-layout-widget/enums/widget-configuration-type.type';
+import { convertUniversalChartFilterToChartFilter } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/utils/convert-universal-chart-filter-to-chart-filter.util';
 
 const resolveFieldMetadataIdOrThrow = ({
   fieldMetadataUniversalIdentifier,
@@ -48,24 +49,15 @@ const convertUniversalFilterToChartFilter = ({
 }: {
   filter: UniversalChartFilter | undefined;
   flatFieldMetadataMaps: MetadataFlatEntityMaps<'fieldMetadata'>;
-}): ChartFilter | undefined => {
-  if (!isDefined(filter)) {
-    return undefined;
-  }
-
-  return {
-    ...filter,
-    recordFilters: filter.recordFilters?.map(
-      ({ fieldMetadataUniversalIdentifier, ...rest }) => ({
-        ...rest,
-        fieldMetadataId: resolveFieldMetadataIdOrThrow({
-          fieldMetadataUniversalIdentifier,
-          flatFieldMetadataMaps,
-        }),
+}): ChartFilter | undefined =>
+  convertUniversalChartFilterToChartFilter({
+    filter,
+    resolveFieldMetadataId: (fieldMetadataUniversalIdentifier) =>
+      resolveFieldMetadataIdOrThrow({
+        fieldMetadataUniversalIdentifier,
+        flatFieldMetadataMaps,
       }),
-    ),
-  };
-};
+  });
 
 export const fromUniversalConfigurationToFlatPageLayoutWidgetConfiguration = ({
   universalConfiguration,

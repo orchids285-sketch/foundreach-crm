@@ -1,6 +1,9 @@
 import { assertFormulaArgumentCountOrThrow } from '@/utils/formula/utils/assertFormulaArgumentCountOrThrow';
 import { assertFormulaArgumentTypeOrThrow } from '@/utils/formula/utils/assertFormulaArgumentTypeOrThrow';
+import { evaluateFormulaSwitch } from '@/utils/formula/utils/evaluateFormulaSwitch';
+import { inferFormulaSwitchReturnTypeOrThrow } from '@/utils/formula/utils/inferFormulaSwitchReturnTypeOrThrow';
 import { isBlankFormulaValue } from '@/utils/formula/utils/isBlankFormulaValue';
+import { transpileFormulaSwitchToPostgresSql } from '@/utils/formula/utils/transpileFormulaSwitchToPostgresSql';
 import { unifyFormulaValueTypesOrThrow } from '@/utils/formula/utils/unifyFormulaValueTypesOrThrow';
 import { type FormulaFunctionDefinition } from '@/utils/formula/types/FormulaFunctionDefinition';
 
@@ -34,6 +37,13 @@ export const FORMULA_LOGICAL_FUNCTIONS: Record<
     // CASE WHEN treats a null condition as false, so null falls through to the else branch.
     evaluate: ([condition, thenValue, elseValue]) =>
       condition === true ? thenValue : elseValue,
+  },
+  SWITCH: {
+    inferReturnTypeOrThrow: (argumentTypes) =>
+      inferFormulaSwitchReturnTypeOrThrow(argumentTypes),
+    toPostgresSql: (argumentsSql) =>
+      transpileFormulaSwitchToPostgresSql(argumentsSql),
+    evaluate: (argumentValues) => evaluateFormulaSwitch(argumentValues),
   },
   ISBLANK: {
     inferReturnTypeOrThrow: (argumentTypes) => {
