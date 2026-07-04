@@ -123,9 +123,6 @@ export const generateEmptyFieldValue = ({
     case FieldMetadataType.FILES: {
       return null;
     }
-    case FieldMetadataType.FORMULA: {
-      return null;
-    }
     case FieldMetadataType.ROLLUP: {
       return null;
     }

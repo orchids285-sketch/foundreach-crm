@@ -13,10 +13,7 @@ export const validateOperatorForFieldTypeOrThrow = (
   fieldMetadata: FlatFieldMetadata,
   fieldName: string,
 ): void => {
-  const allowedOperators = getOperatorsForFieldType(
-    fieldMetadata.type,
-    fieldMetadata.settings,
-  );
+  const allowedOperators = getOperatorsForFieldType(fieldMetadata.type);
 
   if (!allowedOperators.includes(operator)) {
     const fieldType = fieldMetadata.type;

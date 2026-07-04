@@ -20,11 +20,6 @@ import {
   FieldMetadataType,
   NumberDataType,
 } from 'twenty-shared/types';
-import {
-  isDefined,
-  mapFormulaOutputTypeToFieldMetadataType,
-} from 'twenty-shared/utils';
-
 import { OrderByDirectionType } from 'src/engine/api/graphql/workspace-schema-builder/graphql-types/enum';
 import {
   ArrayFilterType,
@@ -101,13 +96,6 @@ export class TypeMapperService {
       return FilesObjectType;
     }
 
-    if (fieldMetadataType === FieldMetadataType.FORMULA) {
-      return this.mapToPreBuiltGraphQLOutputType({
-        fieldMetadataType:
-          this.getFormulaOutputFieldMetadataTypeFromOptions(typeOptions),
-      });
-    }
-
     if (fieldMetadataType === FieldMetadataType.ROLLUP) {
       return this.mapToPreBuiltGraphQLOutputType({
         fieldMetadataType: FieldMetadataType.NUMBER,
@@ -140,13 +128,6 @@ export class TypeMapperService {
       return FilesInputType;
     }
 
-    if (fieldMetadataType === FieldMetadataType.FORMULA) {
-      return this.mapToPreBuiltGraphQLInputType({
-        fieldMetadataType:
-          this.getFormulaOutputFieldMetadataTypeFromOptions(typeOptions),
-      });
-    }
-
     if (fieldMetadataType === FieldMetadataType.ROLLUP) {
       return this.mapToPreBuiltGraphQLInputType({
         fieldMetadataType: FieldMetadataType.NUMBER,
@@ -174,18 +155,6 @@ export class TypeMapperService {
       (typeOptions?.settings as FieldMetadataSettings<FieldMetadataType.NUMBER>)
         ?.dataType ?? NumberDataType.FLOAT,
     );
-  }
-
-  private getFormulaOutputFieldMetadataTypeFromOptions(
-    typeOptions?: TypeOptions,
-  ): FieldMetadataType {
-    const formulaOutputType = (
-      typeOptions?.settings as FieldMetadataSettings<FieldMetadataType.FORMULA>
-    )?.outputType;
-
-    return isDefined(formulaOutputType)
-      ? mapFormulaOutputTypeToFieldMetadataType(formulaOutputType)
-      : FieldMetadataType.TEXT;
   }
 
   mapToFilterType(
@@ -228,12 +197,6 @@ export class TypeMapperService {
       [FieldMetadataType.TS_VECTOR, TSVectorFilterType],
     ]);
 
-    if (fieldMetadataType === FieldMetadataType.FORMULA) {
-      return this.mapToFilterType(
-        this.getFormulaOutputFieldMetadataTypeFromOptions(typeOptions),
-      );
-    }
-
     if (fieldMetadataType === FieldMetadataType.ROLLUP) {
       return this.mapToFilterType(FieldMetadataType.NUMBER);
     }
@@ -262,7 +225,6 @@ export class TypeMapperService {
       [FieldMetadataType.RAW_JSON, OrderByDirectionType],
       [FieldMetadataType.ARRAY, OrderByDirectionType],
       [FieldMetadataType.TS_VECTOR, OrderByDirectionType], // TODO: Add TSVectorOrderByType
-      [FieldMetadataType.FORMULA, OrderByDirectionType],
       [FieldMetadataType.ROLLUP, OrderByDirectionType],
     ]);
 

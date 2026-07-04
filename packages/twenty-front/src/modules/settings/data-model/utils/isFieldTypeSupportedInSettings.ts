@@ -4,4 +4,5 @@ import { type SettingsFieldType } from '@/settings/data-model/types/SettingsFiel
 
 export const isFieldTypeSupportedInSettings = (
   fieldType: FieldType,
-): fieldType is SettingsFieldType => fieldType in SETTINGS_FIELD_TYPE_CONFIGS;
+): fieldType is Extract<SettingsFieldType, FieldType> =>
+  fieldType in SETTINGS_FIELD_TYPE_CONFIGS;

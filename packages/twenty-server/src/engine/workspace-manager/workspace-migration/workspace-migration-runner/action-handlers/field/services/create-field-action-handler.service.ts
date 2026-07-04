@@ -13,7 +13,9 @@ import { findFlatEntityByIdInFlatEntityMapsOrThrow } from 'src/engine/metadata-m
 import { findManyFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-many-flat-entity-by-id-in-flat-entity-maps.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { buildRollupRecomputeSql } from 'src/engine/metadata-modules/flat-field-metadata/utils/build-rollup-recompute-sql.util';
-import { deriveFormulaAsExpressionForFormulaField } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-formula-as-expression-for-formula-field.util';
+import { deriveComputedAsExpressionForFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-as-expression-for-flat-field-metadata.util';
+import { deriveComputedCurrencyCodeAsExpressionOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-currency-code-as-expression.util';
+import { getFlatFieldMetadataComputedExpression } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-flat-field-metadata-computed-expression.util';
 import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
 import { resolveRollupSqlContextOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/resolve-rollup-sql-context.util';
 import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
@@ -202,24 +204,36 @@ export class CreateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       operation: EnumOperation.CREATE,
     });
 
-    const formulaAsExpression = isFlatFieldMetadataOfType(
-      flatFieldMetadata,
-      FieldMetadataType.FORMULA,
-    )
-      ? deriveFormulaAsExpressionForFormulaField({
-          formulaFlatFieldMetadata: flatFieldMetadata,
-          siblingFlatFieldMetadatas: findManyFlatEntityByIdInFlatEntityMaps({
+    const computedExpression = getFlatFieldMetadataComputedExpression(
+      flatFieldMetadata.settings,
+    );
+    const siblingFlatFieldMetadatas =
+      computedExpression !== null
+        ? findManyFlatEntityByIdInFlatEntityMaps({
             flatEntityMaps: flatFieldMetadataMaps,
             flatEntityIds: flatObjectMetadata.fieldIds,
-          }),
-        })
-      : undefined;
+          })
+        : [];
 
     const columnDefinitions = generateColumnDefinitions({
       flatFieldMetadata,
       flatObjectMetadata,
       workspaceId,
-      formulaAsExpression,
+      computedAsExpression:
+        computedExpression !== null
+          ? deriveComputedAsExpressionForFlatFieldMetadata({
+              computedFlatFieldMetadata: flatFieldMetadata,
+              siblingFlatFieldMetadatas,
+            })
+          : undefined,
+      computedCurrencyCodeAsExpression:
+        computedExpression !== null &&
+        isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.CURRENCY)
+          ? deriveComputedCurrencyCodeAsExpressionOrThrow({
+              computedExpression,
+              siblingFlatFieldMetadatas,
+            })
+          : undefined,
     });
 
     await executeBatchEnumOperations({

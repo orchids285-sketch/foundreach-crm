@@ -398,7 +398,7 @@ export class FieldMetadataService extends TypeOrmQueryService<FieldMetadataEntit
       },
     );
 
-    if (isDefined(updateFieldInput.update?.settings)) {
+    if (isDefined(updateFieldInput.settings)) {
       await this.enqueueFilteredRollupBackfill({
         workspaceId,
         flatFieldMetadatas: [updatedFlatFieldMetadata],

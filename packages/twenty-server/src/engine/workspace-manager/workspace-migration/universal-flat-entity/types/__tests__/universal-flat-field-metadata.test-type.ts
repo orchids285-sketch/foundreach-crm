@@ -120,12 +120,14 @@ type SettingsExpectedResult =
       __JsonbPropertyBrand__?: undefined;
     }
   | {
+      computedExpression?: string | undefined;
       dataType?: NumberDataType | undefined;
       decimals?: number | undefined;
       type?: FieldNumberVariant | undefined;
       __JsonbPropertyBrand__?: undefined;
     }
   | {
+      computedExpression?: string | undefined;
       displayedMaxRows?: number | undefined;
       __JsonbPropertyBrand__?: undefined;
     }

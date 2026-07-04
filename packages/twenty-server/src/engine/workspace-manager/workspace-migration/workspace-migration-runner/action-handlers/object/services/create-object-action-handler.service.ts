@@ -6,7 +6,9 @@ import { v4 } from 'uuid';
 import { WorkspaceMigrationRunnerActionHandler } from 'src/engine/workspace-manager/workspace-migration/workspace-migration-runner/interfaces/workspace-migration-runner-action-handler-service.interface';
 
 import { ALL_METADATA_ENTITY_BY_METADATA_NAME } from 'src/engine/metadata-modules/flat-entity/constant/all-metadata-entity-by-metadata-name.constant';
-import { deriveFormulaAsExpressionForFormulaField } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-formula-as-expression-for-formula-field.util';
+import { deriveComputedAsExpressionForFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-as-expression-for-flat-field-metadata.util';
+import { deriveComputedCurrencyCodeAsExpressionOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-currency-code-as-expression.util';
+import { getFlatFieldMetadataComputedExpression } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-flat-field-metadata-computed-expression.util';
 import { isCompositeFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-composite-flat-field-metadata.util';
 import { isEnumFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-enum-flat-field-metadata.util';
 import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
@@ -143,38 +145,53 @@ export class CreateObjectActionHandlerService extends WorkspaceMigrationRunnerAc
       ]),
     );
 
-    const columnDefinitions = flatFieldMetadatas.flatMap((flatFieldMetadata) =>
-      generateColumnDefinitions({
-        flatFieldMetadata,
-        flatObjectMetadata,
-        workspaceId,
-        formulaAsExpression: isFlatFieldMetadataOfType(
+    const columnDefinitions = flatFieldMetadatas.flatMap(
+      (flatFieldMetadata) => {
+        const computedExpression = getFlatFieldMetadataComputedExpression(
+          flatFieldMetadata.settings,
+        );
+
+        return generateColumnDefinitions({
           flatFieldMetadata,
-          FieldMetadataType.FORMULA,
-        )
-          ? deriveFormulaAsExpressionForFormulaField({
-              formulaFlatFieldMetadata: flatFieldMetadata,
-              siblingFlatFieldMetadatas: flatFieldMetadatas,
-            })
-          : undefined,
-        searchVectorAsExpression: isFlatFieldMetadataOfType(
-          flatFieldMetadata,
-          FieldMetadataType.TS_VECTOR,
-        )
-          ? deriveSearchVectorAsExpressionForTsVectorField({
-              targetSearchFieldMetadatas:
-                getSearchFieldMetadatasByTsVectorFieldId?.(
-                  flatFieldMetadata.id,
-                ) ??
-                getTargetSearchFieldMetadatasForTsVectorField({
-                  tsVectorFieldMetadataId: flatFieldMetadata.id,
-                  flatSearchFieldMetadataMaps:
-                    allFlatEntityMaps.flatSearchFieldMetadataMaps,
-                }),
-              indexedFieldById,
-            })
-          : undefined,
-      }),
+          flatObjectMetadata,
+          workspaceId,
+          computedAsExpression:
+            computedExpression !== null
+              ? deriveComputedAsExpressionForFlatFieldMetadata({
+                  computedFlatFieldMetadata: flatFieldMetadata,
+                  siblingFlatFieldMetadatas: flatFieldMetadatas,
+                })
+              : undefined,
+          computedCurrencyCodeAsExpression:
+            computedExpression !== null &&
+            isFlatFieldMetadataOfType(
+              flatFieldMetadata,
+              FieldMetadataType.CURRENCY,
+            )
+              ? deriveComputedCurrencyCodeAsExpressionOrThrow({
+                  computedExpression,
+                  siblingFlatFieldMetadatas: flatFieldMetadatas,
+                })
+              : undefined,
+          searchVectorAsExpression: isFlatFieldMetadataOfType(
+            flatFieldMetadata,
+            FieldMetadataType.TS_VECTOR,
+          )
+            ? deriveSearchVectorAsExpressionForTsVectorField({
+                targetSearchFieldMetadatas:
+                  getSearchFieldMetadatasByTsVectorFieldId?.(
+                    flatFieldMetadata.id,
+                  ) ??
+                  getTargetSearchFieldMetadatasForTsVectorField({
+                    tsVectorFieldMetadataId: flatFieldMetadata.id,
+                    flatSearchFieldMetadataMaps:
+                      allFlatEntityMaps.flatSearchFieldMetadataMaps,
+                  }),
+                indexedFieldById,
+              })
+            : undefined,
+        });
+      },
     );
 
     const enumOrCompositeFlatFieldMetadatas = flatFieldMetadatas.filter(

@@ -1,8 +1,5 @@
 import { FORMULA_KEYWORDS } from '@/settings/data-model/fields/forms/formula/constants/FormulaKeywords';
-import {
-  FORMULA_FUNCTIONS,
-  type FormulaValueType,
-} from 'twenty-shared/utils';
+import { FORMULA_FUNCTIONS, type FormulaValueType } from 'twenty-shared/utils';
 
 export type FormulaCompletionItemKind = 'field' | 'function' | 'keyword';
 

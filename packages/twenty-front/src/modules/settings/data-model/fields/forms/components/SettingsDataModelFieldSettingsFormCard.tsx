@@ -1,8 +1,14 @@
 import omit from 'lodash.omit';
 import { z } from 'zod';
 
+import { useFieldMetadataItemById } from '@/object-metadata/hooks/useFieldMetadataItemById';
+import { getFieldComputedExpression } from '@/object-metadata/utils/getFieldComputedExpression';
 import { SettingsDataModelPreviewFormCard } from '@/settings/data-model/components/SettingsDataModelPreviewFormCard';
 import { SETTINGS_FIELD_TYPE_CONFIGS } from '@/settings/data-model/constants/SettingsFieldTypeConfigs';
+import {
+  SETTINGS_FIELD_TYPE_FORMULA,
+  type SettingsFieldTypeFormula,
+} from '@/settings/data-model/constants/SettingsFieldTypeFormula';
 import { settingsDataModelFieldAddressFormSchema } from '@/settings/data-model/fields/forms/address/components/SettingsDataModelFieldAddressForm';
 import { SettingsDataModelFieldAddressSettingsFormCard } from '@/settings/data-model/fields/forms/address/components/SettingsDataModelFieldAddressSettingsFormCard';
 import { settingsDataModelFieldBooleanFormSchema } from '@/settings/data-model/fields/forms/boolean/components/SettingsDataModelFieldBooleanForm';
@@ -38,6 +44,8 @@ import { mergeSettingsSchemas } from '@/settings/data-model/fields/forms/utils/m
 import { settingsDataModelFieldMaxValuesSchema } from '@/settings/data-model/fields/forms/utils/settingsDataModelFieldMaxValuesSchema';
 import { settingsDataModelFieldOnClickActionSchema } from '@/settings/data-model/fields/forms/utils/settingsDataModelFieldOnClickActionSchema';
 import { useFormContext } from 'react-hook-form';
+import { COMPUTABLE_FIELD_METADATA_TYPES } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { type SettingsDataModelFieldEditFormValues } from '~/pages/settings/data-model/SettingsObjectFieldEdit';
 
@@ -131,8 +139,8 @@ const filesFieldFormSchema = z
   .object({ type: z.literal(FieldMetadataType.FILES) })
   .merge(mergeSettingsSchemas(settingsDataModelFieldMaxValuesSchema));
 
-const formulaFieldFormSchema = z
-  .object({ type: z.literal(FieldMetadataType.FORMULA) })
+const computedFieldFormSchema = z
+  .object({ type: z.enum(COMPUTABLE_FIELD_METADATA_TYPES) })
   .extend(settingsDataModelFieldFormulaFormSchema.shape);
 
 const rollupFieldFormSchema = z
@@ -160,7 +168,6 @@ const otherFieldsFormSchema = z
           FieldMetadataType.LINKS,
           FieldMetadataType.ARRAY,
           FieldMetadataType.FILES,
-          FieldMetadataType.FORMULA,
           FieldMetadataType.ROLLUP,
         ]),
       ) as [FieldMetadataType, ...FieldMetadataType[]],
@@ -168,9 +175,9 @@ const otherFieldsFormSchema = z
   })
   .extend(isUniqueFieldFormSchema.shape);
 
-export const settingsDataModelFieldSettingsFormSchema = z.discriminatedUnion(
-  'type',
-  [
+export const settingsDataModelFieldSettingsFormSchema = z.union([
+  computedFieldFormSchema,
+  z.discriminatedUnion('type', [
     booleanFieldFormSchema,
     currencyFieldFormSchema,
     dateFieldFormSchema,
@@ -187,15 +194,14 @@ export const settingsDataModelFieldSettingsFormSchema = z.discriminatedUnion(
     linksFieldFormSchema,
     arrayFieldFormSchema,
     filesFieldFormSchema,
-    formulaFieldFormSchema,
     rollupFieldFormSchema,
     otherFieldsFormSchema,
-  ],
-);
+  ]),
+]);
 
 type SettingsDataModelFieldSettingsFormCardProps = {
   existingFieldMetadataId: string;
-  fieldType: FieldMetadataType;
+  fieldType: FieldMetadataType | SettingsFieldTypeFormula;
   objectNameSingular: string;
   disabled?: boolean;
 };
@@ -209,7 +215,6 @@ const previewableTypes = [
   FieldMetadataType.DATE_TIME,
   FieldMetadataType.EMAILS,
   FieldMetadataType.FILES,
-  FieldMetadataType.FORMULA,
   FieldMetadataType.FULL_NAME,
   FieldMetadataType.LINKS,
   FieldMetadataType.MULTI_SELECT,
@@ -233,6 +238,31 @@ export const SettingsDataModelFieldSettingsFormCard = ({
   disabled = false,
 }: SettingsDataModelFieldSettingsFormCardProps) => {
   const { watch } = useFormContext<SettingsDataModelFieldEditFormValues>();
+
+  const { fieldMetadataItem: existingFieldMetadataItem } =
+    useFieldMetadataItemById(existingFieldMetadataId);
+
+  if (fieldType === SETTINGS_FIELD_TYPE_FORMULA) {
+    return (
+      <SettingsDataModelFieldFormulaSettingsFormCard
+        existingFieldMetadataId={existingFieldMetadataId}
+        objectNameSingular={objectNameSingular}
+        disabled={disabled}
+      />
+    );
+  }
+
+  if (
+    isDefined(getFieldComputedExpression(existingFieldMetadataItem?.settings))
+  ) {
+    return (
+      <SettingsDataModelFieldFormulaSettingsFormCard
+        existingFieldMetadataId={existingFieldMetadataId}
+        objectNameSingular={objectNameSingular}
+        disabled={disabled}
+      />
+    );
+  }
 
   if (!previewableTypes.includes(fieldType)) {
     return null;
@@ -288,16 +318,6 @@ export const SettingsDataModelFieldSettingsFormCard = ({
   if (fieldType === FieldMetadataType.NUMBER) {
     return (
       <SettingsDataModelFieldNumberSettingsFormCard
-        existingFieldMetadataId={existingFieldMetadataId}
-        objectNameSingular={objectNameSingular}
-        disabled={disabled}
-      />
-    );
-  }
-
-  if (fieldType === FieldMetadataType.FORMULA) {
-    return (
-      <SettingsDataModelFieldFormulaSettingsFormCard
         existingFieldMetadataId={existingFieldMetadataId}
         objectNameSingular={objectNameSingular}
         disabled={disabled}

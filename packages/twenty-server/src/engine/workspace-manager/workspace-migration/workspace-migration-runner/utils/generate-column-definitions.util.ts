@@ -4,17 +4,18 @@ import {
   RelationType,
 } from 'twenty-shared/types';
 
+import { isDefined } from 'twenty-shared/utils';
 import { type ColumnType } from 'typeorm';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
 import { type CompositeFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/types/composite-field-metadata-type.type';
-import { mapFormulaOutputTypeToFieldMetadataType } from 'twenty-shared/utils';
 
 import {
   computeColumnName,
   computeCompositeColumnName,
 } from 'src/engine/metadata-modules/field-metadata/utils/compute-column-name.util';
 import { getCompositeTypeOrThrow } from 'src/engine/metadata-modules/field-metadata/utils/get-composite-type-or-throw.util';
+import { getFlatFieldMetadataComputedExpression } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-flat-field-metadata-computed-expression.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { isCompositeFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-composite-flat-field-metadata.util';
 import { isFlatFieldMetadataOfType } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-of-type.util';
@@ -99,23 +100,22 @@ export const generateCompositeColumnDefinition = ({
   return definition;
 };
 
-const generateFormulaColumnDefinition = (
-  flatFieldMetadata: FlatFieldMetadata<FieldMetadataType.FORMULA>,
-  formulaAsExpression?: string,
-): WorkspaceSchemaColumnDefinition => {
+const generateComputedColumnDefinition = ({
+  flatFieldMetadata,
+  computedAsExpression,
+}: {
+  flatFieldMetadata: FlatFieldMetadata;
+  computedAsExpression?: string;
+}): WorkspaceSchemaColumnDefinition => {
   const columnName = computeColumnName(flatFieldMetadata.name);
 
   return {
     name: columnName,
-    type: fieldMetadataTypeToColumnType(
-      mapFormulaOutputTypeToFieldMetadataType(
-        flatFieldMetadata.settings.outputType,
-      ),
-    ),
+    type: fieldMetadataTypeToColumnType(flatFieldMetadata.type),
     isNullable: true,
     isArray: false,
     default: null,
-    asExpression: formulaAsExpression,
+    asExpression: computedAsExpression,
     generatedType: 'STORED',
     isPrimary: false,
   };
@@ -216,13 +216,15 @@ export const generateColumnDefinitions = ({
   flatObjectMetadata,
   workspaceId,
   searchVectorAsExpression,
-  formulaAsExpression,
+  computedAsExpression,
+  computedCurrencyCodeAsExpression,
 }: {
   flatFieldMetadata: FlatFieldMetadata;
   flatObjectMetadata: FlatObjectMetadata;
   workspaceId: string;
   searchVectorAsExpression?: string;
-  formulaAsExpression?: string;
+  computedAsExpression?: string;
+  computedCurrencyCodeAsExpression?: string;
 }): WorkspaceSchemaColumnDefinition[] => {
   const { tableName, schemaName } = getWorkspaceSchemaContextForMigration({
     workspaceId,
@@ -231,22 +233,46 @@ export const generateColumnDefinitions = ({
 
   if (isCompositeFlatFieldMetadata(flatFieldMetadata)) {
     const compositeType = getCompositeTypeOrThrow(flatFieldMetadata.type);
+    const asExpressionByCompositePropertyName: Record<
+      string,
+      string | undefined
+    > = {
+      amountMicros: computedAsExpression,
+      currencyCode: computedCurrencyCodeAsExpression,
+    };
 
-    return compositeType.properties.map((property) =>
-      generateCompositeColumnDefinition({
-        compositeProperty: property,
-        parentFlatFieldMetadata: flatFieldMetadata,
-        flatObjectMetadata,
-        workspaceId,
-      }),
+    return compositeType.properties.map(
+      (property): WorkspaceSchemaColumnDefinition => {
+        const columnDefinition = generateCompositeColumnDefinition({
+          compositeProperty: property,
+          parentFlatFieldMetadata: flatFieldMetadata,
+          flatObjectMetadata,
+          workspaceId,
+        });
+        const asExpression = asExpressionByCompositePropertyName[property.name];
+
+        if (!isDefined(asExpression)) {
+          return columnDefinition;
+        }
+
+        return {
+          ...columnDefinition,
+          default: null,
+          asExpression,
+          generatedType: 'STORED',
+        };
+      },
     );
   }
 
   if (
-    isFlatFieldMetadataOfType(flatFieldMetadata, FieldMetadataType.FORMULA)
+    getFlatFieldMetadataComputedExpression(flatFieldMetadata.settings) !== null
   ) {
     return [
-      generateFormulaColumnDefinition(flatFieldMetadata, formulaAsExpression),
+      generateComputedColumnDefinition({
+        flatFieldMetadata,
+        computedAsExpression,
+      }),
     ];
   }
 

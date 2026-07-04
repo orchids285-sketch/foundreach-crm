@@ -4,10 +4,7 @@ import {
   FieldMetadataType,
   compositeTypeDefinitions,
 } from 'twenty-shared/types';
-import {
-  isDefined,
-  mapFormulaOutputTypeToFieldMetadataType,
-} from 'twenty-shared/utils';
+import { isDefined } from 'twenty-shared/utils';
 import { type ColumnType, type EntitySchemaColumnOptions } from 'typeorm';
 
 import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-morph-or-relation-field-join-column-name.util';
@@ -16,7 +13,6 @@ import { RelationType } from 'src/engine/metadata-modules/field-metadata/interfa
 import { computeCompositeColumnName } from 'src/engine/metadata-modules/field-metadata/utils/compute-column-name.util';
 import { isCompositeFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/utils/is-composite-field-metadata-type.util';
 import { isEnumFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/utils/is-enum-field-metadata-type.util';
-import { isFieldMetadataSettingsOfType } from 'src/engine/metadata-modules/field-metadata/utils/is-field-metadata-settings-of-type.util';
 import { serializeDefaultValue } from 'src/engine/metadata-modules/field-metadata/utils/serialize-default-value';
 import {
   type EntitySchemaFieldMetadata,
@@ -87,18 +83,7 @@ export class EntitySchemaColumnFactory {
         continue;
       }
 
-      const columnType =
-        fieldMetadata.type === FieldMetadataType.FORMULA &&
-        isFieldMetadataSettingsOfType(
-          fieldMetadata.settings,
-          FieldMetadataType.FORMULA,
-        )
-          ? fieldMetadataTypeToColumnType(
-              mapFormulaOutputTypeToFieldMetadataType(
-                fieldMetadata.settings.outputType,
-              ),
-            )
-          : fieldMetadataTypeToColumnType(fieldMetadata.type);
+      const columnType = fieldMetadataTypeToColumnType(fieldMetadata.type);
       const defaultValue = serializeDefaultValue(fieldMetadata.defaultValue);
 
       entitySchemaColumnMap[key] = {

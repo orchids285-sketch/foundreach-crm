@@ -18,7 +18,9 @@ import { getCompositeTypeOrThrow } from 'src/engine/metadata-modules/field-metad
 import { findFlatEntityByIdInFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps-or-throw.util';
 import { findManyFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-many-flat-entity-by-id-in-flat-entity-maps.util';
 import { buildRollupRecomputeSql } from 'src/engine/metadata-modules/flat-field-metadata/utils/build-rollup-recompute-sql.util';
-import { deriveFormulaAsExpressionForFormulaField } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-formula-as-expression-for-formula-field.util';
+import { deriveComputedAsExpressionForFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-as-expression-for-flat-field-metadata.util';
+import { deriveComputedCurrencyCodeAsExpressionOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-computed-currency-code-as-expression.util';
+import { getFlatFieldMetadataComputedExpression } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-flat-field-metadata-computed-expression.util';
 import { resolveRollupSqlContextOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/resolve-rollup-sql-context.util';
 import { findFlatEntityByUniversalIdentifierOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-universal-identifier-or-throw.util';
 import { findFieldRelatedIndexes } from 'src/engine/metadata-modules/flat-field-metadata/utils/find-field-related-index.util';
@@ -357,35 +359,47 @@ export class UpdateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
       };
     }
 
-    if (
-      update.settings !== undefined &&
-      isFlatFieldMetadataOfType(
-        optimisticFlatFieldMetadata,
-        FieldMetadataType.FORMULA,
-      )
-    ) {
+    const computedExpression =
+      update.settings !== undefined
+        ? getFlatFieldMetadataComputedExpression(
+            optimisticFlatFieldMetadata.settings,
+          )
+        : null;
+
+    if (computedExpression !== null) {
       // Postgres has no ALTER for a generated expression: drop and recreate the
       // column, letting Postgres recompute every row.
-      const formulaAsExpression = deriveFormulaAsExpressionForFormulaField({
-        formulaFlatFieldMetadata: optimisticFlatFieldMetadata,
-        siblingFlatFieldMetadatas: findManyFlatEntityByIdInFlatEntityMaps({
-          flatEntityMaps: flatFieldMetadataMaps,
-          flatEntityIds: flatObjectMetadata.fieldIds,
-        }),
+      const siblingFlatFieldMetadatas = findManyFlatEntityByIdInFlatEntityMaps({
+        flatEntityMaps: flatFieldMetadataMaps,
+        flatEntityIds: flatObjectMetadata.fieldIds,
       });
 
       const columnDefinitions = generateColumnDefinitions({
         flatFieldMetadata: optimisticFlatFieldMetadata,
         flatObjectMetadata,
         workspaceId,
-        formulaAsExpression,
+        computedAsExpression: deriveComputedAsExpressionForFlatFieldMetadata({
+          computedFlatFieldMetadata: optimisticFlatFieldMetadata,
+          siblingFlatFieldMetadatas,
+        }),
+        computedCurrencyCodeAsExpression: isFlatFieldMetadataOfType(
+          optimisticFlatFieldMetadata,
+          FieldMetadataType.CURRENCY,
+        )
+          ? deriveComputedCurrencyCodeAsExpressionOrThrow({
+              computedExpression,
+              siblingFlatFieldMetadatas,
+            })
+          : undefined,
       });
 
       await this.workspaceSchemaManagerService.columnManager.dropColumns({
         queryRunner,
         schemaName,
         tableName,
-        columnNames: [optimisticFlatFieldMetadata.name],
+        columnNames: columnDefinitions.map(
+          (columnDefinition) => columnDefinition.name,
+        ),
       });
       await this.workspaceSchemaManagerService.columnManager.addColumns({
         queryRunner,

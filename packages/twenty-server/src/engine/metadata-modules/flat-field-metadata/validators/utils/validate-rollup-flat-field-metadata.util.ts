@@ -144,58 +144,60 @@ const validateRollupFilterFields = ({
   const recordFilters =
     flatEntityToValidate.universalSettings.filter?.recordFilters ?? [];
 
-  return recordFilters.flatMap((recordFilter) => {
-    const filterFieldMetadataUniversalIdentifier =
-      recordFilter.fieldMetadataUniversalIdentifier;
+  return recordFilters.flatMap(
+    (recordFilter): FlatFieldMetadataValidationError[] => {
+      const filterFieldMetadataUniversalIdentifier =
+        recordFilter.fieldMetadataUniversalIdentifier;
 
-    if (!isNonEmptyString(filterFieldMetadataUniversalIdentifier)) {
-      return [
-        {
-          code: FieldMetadataExceptionCode.INVALID_FIELD_INPUT,
-          message: 'Rollup filter entry is missing its field',
-          value: filterFieldMetadataUniversalIdentifier,
-          userFriendlyMessage: msg`Rollup filter entry is missing its field`,
-        },
-      ];
-    }
+      if (!isNonEmptyString(filterFieldMetadataUniversalIdentifier)) {
+        return [
+          {
+            code: FieldMetadataExceptionCode.INVALID_FIELD_INPUT,
+            message: 'Rollup filter entry is missing its field',
+            value: filterFieldMetadataUniversalIdentifier,
+            userFriendlyMessage: msg`Rollup filter entry is missing its field`,
+          },
+        ];
+      }
 
-    const filterFlatFieldMetadata =
-      findFlatEntityByUniversalIdentifier({
-        universalIdentifier: filterFieldMetadataUniversalIdentifier,
-        flatEntityMaps: remainingFlatEntityMapsToValidate,
-      }) ??
-      findFlatEntityByUniversalIdentifier({
-        universalIdentifier: filterFieldMetadataUniversalIdentifier,
-        flatEntityMaps: flatFieldMetadataMaps,
-      });
+      const filterFlatFieldMetadata =
+        findFlatEntityByUniversalIdentifier({
+          universalIdentifier: filterFieldMetadataUniversalIdentifier,
+          flatEntityMaps: remainingFlatEntityMapsToValidate,
+        }) ??
+        findFlatEntityByUniversalIdentifier({
+          universalIdentifier: filterFieldMetadataUniversalIdentifier,
+          flatEntityMaps: flatFieldMetadataMaps,
+        });
 
-    if (!isDefined(filterFlatFieldMetadata)) {
-      return [
-        {
-          code: FieldMetadataExceptionCode.FIELD_METADATA_NOT_FOUND,
-          message: `Rollup filter field not found: ${filterFieldMetadataUniversalIdentifier}`,
-          value: filterFieldMetadataUniversalIdentifier,
-          userFriendlyMessage: msg`Rollup filter field not found`,
-        },
-      ];
-    }
+      if (!isDefined(filterFlatFieldMetadata)) {
+        return [
+          {
+            code: FieldMetadataExceptionCode.FIELD_METADATA_NOT_FOUND,
+            message: `Rollup filter field not found: ${filterFieldMetadataUniversalIdentifier}`,
+            value: filterFieldMetadataUniversalIdentifier,
+            userFriendlyMessage: msg`Rollup filter field not found`,
+          },
+        ];
+      }
 
-    if (
-      filterFlatFieldMetadata.objectMetadataUniversalIdentifier !==
-      relationFlatFieldMetadata.relationTargetObjectMetadataUniversalIdentifier
-    ) {
-      return [
-        {
-          code: FieldMetadataExceptionCode.INVALID_FIELD_INPUT,
-          message: `Rollup filter field ${filterFieldMetadataUniversalIdentifier} is not on the relation target object`,
-          value: filterFieldMetadataUniversalIdentifier,
-          userFriendlyMessage: msg`Rollup filter fields must be on the related object`,
-        },
-      ];
-    }
+      if (
+        filterFlatFieldMetadata.objectMetadataUniversalIdentifier !==
+        relationFlatFieldMetadata.relationTargetObjectMetadataUniversalIdentifier
+      ) {
+        return [
+          {
+            code: FieldMetadataExceptionCode.INVALID_FIELD_INPUT,
+            message: `Rollup filter field ${filterFieldMetadataUniversalIdentifier} is not on the relation target object`,
+            value: filterFieldMetadataUniversalIdentifier,
+            userFriendlyMessage: msg`Rollup filter fields must be on the related object`,
+          },
+        ];
+      }
 
-    return [];
-  });
+      return [];
+    },
+  );
 };
 
 const validateRollupTargetField = ({

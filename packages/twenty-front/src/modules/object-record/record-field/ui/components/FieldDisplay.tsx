@@ -6,7 +6,6 @@ import { BooleanFieldDisplay } from '@/object-record/record-field/ui/meta-types/
 import { EmailsFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/EmailsFieldDisplay';
 import { FilesFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/FilesFieldDisplay';
 import { ForbiddenFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/ForbiddenFieldDisplay';
-import { FormulaFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/FormulaFieldDisplay';
 import { LinksFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/LinksFieldDisplay';
 import { PhonesFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/PhonesFieldDisplay';
 import { RatingFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/RatingFieldDisplay';
@@ -19,7 +18,6 @@ import { isFieldArray } from '@/object-record/record-field/ui/types/guards/isFie
 import { isFieldBoolean } from '@/object-record/record-field/ui/types/guards/isFieldBoolean';
 import { isFieldEmails } from '@/object-record/record-field/ui/types/guards/isFieldEmails';
 import { isFieldFiles } from '@/object-record/record-field/ui/types/guards/isFieldFiles';
-import { isFieldFormula } from '@/object-record/record-field/ui/types/guards/isFieldFormula';
 import { isFieldLinks } from '@/object-record/record-field/ui/types/guards/isFieldLinks';
 import { isFieldPhones } from '@/object-record/record-field/ui/types/guards/isFieldPhones';
 import { isFieldRating } from '@/object-record/record-field/ui/types/guards/isFieldRating';
@@ -114,8 +112,6 @@ export const FieldDisplay = () => {
     <BooleanFieldDisplay />
   ) : isFieldRating(fieldDefinition) ? (
     <RatingFieldDisplay readonly={isRecordFieldReadOnly} />
-  ) : isFieldFormula(fieldDefinition) ? (
-    <FormulaFieldDisplay />
   ) : isFieldRollup(fieldDefinition) ? (
     <RollupFieldDisplay />
   ) : isFieldRichText(fieldDefinition) ? (

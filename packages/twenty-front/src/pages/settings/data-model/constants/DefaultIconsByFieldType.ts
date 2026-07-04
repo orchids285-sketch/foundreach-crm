@@ -1,13 +1,20 @@
+import {
+  SETTINGS_FIELD_TYPE_FORMULA,
+  type SettingsFieldTypeFormula,
+} from '@/settings/data-model/constants/SettingsFieldTypeFormula';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 
-export const DEFAULT_ICONS_BY_FIELD_TYPE: Record<FieldMetadataType, string> = {
+export const DEFAULT_ICONS_BY_FIELD_TYPE: Record<
+  FieldMetadataType | SettingsFieldTypeFormula,
+  string
+> = {
   [FieldMetadataType.ADDRESS]: 'IconMap',
   [FieldMetadataType.BOOLEAN]: 'IconToggleLeft',
   [FieldMetadataType.CURRENCY]: 'IconMoneybag',
   [FieldMetadataType.DATE]: 'IconCalendarEvent',
   [FieldMetadataType.DATE_TIME]: 'IconCalendarClock',
   [FieldMetadataType.FILES]: 'IconFile',
-  [FieldMetadataType.FORMULA]: 'IconMathFunction',
+  [SETTINGS_FIELD_TYPE_FORMULA]: 'IconMathFunction',
   [FieldMetadataType.FULL_NAME]: 'IconUserCircle',
   [FieldMetadataType.MULTI_SELECT]: 'IconTags',
   [FieldMetadataType.NUMBER]: 'IconNumber9',

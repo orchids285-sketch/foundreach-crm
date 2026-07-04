@@ -1,7 +1,6 @@
 import { type Monaco } from '@monaco-editor/react';
 import { type editor } from 'monaco-editor';
 import { useEffect, useState } from 'react';
-import { type FormulaOutputType } from 'twenty-shared/types';
 import { isDefined, type FormulaValueType } from 'twenty-shared/utils';
 import { CodeEditor } from 'twenty-ui/input';
 
@@ -31,7 +30,7 @@ const getMonacoCompletionItemKind = (
 
 type SettingsDataModelFieldFormulaExpressionEditorProps = {
   expression: string;
-  outputType: FormulaOutputType;
+  expectedFormulaValueType: FormulaValueType;
   fieldReferenceTypes: Record<string, FormulaValueType>;
   onChange: (expression: string) => void;
   disabled?: boolean;
@@ -39,7 +38,7 @@ type SettingsDataModelFieldFormulaExpressionEditorProps = {
 
 export const SettingsDataModelFieldFormulaExpressionEditor = ({
   expression,
-  outputType,
+  expectedFormulaValueType,
   fieldReferenceTypes,
   onChange,
   disabled,
@@ -113,7 +112,7 @@ export const SettingsDataModelFieldFormulaExpressionEditor = ({
       TWENTY_FORMULA_LANGUAGE_ID,
       getFormulaExpressionMarkers({
         expression,
-        outputType,
+        expectedFormulaValueType,
         fieldReferenceTypes,
       }),
     );
@@ -121,7 +120,7 @@ export const SettingsDataModelFieldFormulaExpressionEditor = ({
     monacoInstance,
     editorInstance,
     expression,
-    outputType,
+    expectedFormulaValueType,
     fieldReferenceTypes,
   ]);
 

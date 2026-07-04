@@ -65,6 +65,13 @@ describe('buildFormulaCompletionItems', () => {
       .filter((completionItem) => completionItem.kind === 'keyword')
       .map((completionItem) => completionItem.label);
 
-    expect(keywordLabels).toEqual(['AND', 'OR', 'NOT', 'TRUE', 'FALSE', 'NULL']);
+    expect(keywordLabels).toEqual([
+      'AND',
+      'OR',
+      'NOT',
+      'TRUE',
+      'FALSE',
+      'NULL',
+    ]);
   });
 });

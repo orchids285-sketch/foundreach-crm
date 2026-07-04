@@ -13,6 +13,7 @@ import { FlatFieldMetadataTypeValidatorService } from 'src/engine/metadata-modul
 import { FlatFieldMetadataRelationPropertiesToCompare } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata-relation-properties-to-compare.type';
 import { isFlatFieldMetadataNameSyncedWithLabel } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-flat-field-metadata-name-synced-with-label.util';
 import { isMorphOrRelationUniversalFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
+import { validateComputedFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-computed-flat-field-metadata.util';
 import { validateFlatFieldMetadataIsNotReferencedByComputedField } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-is-not-referenced-by-computed-field.util';
 import { validateFlatFieldMetadataNameAvailability } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-name-availability.util';
 import { validateFlatFieldMetadataName } from 'src/engine/metadata-modules/flat-field-metadata/validators/utils/validate-flat-field-metadata-name.util';
@@ -219,6 +220,13 @@ export class FlatFieldMetadataValidatorService {
       });
     }
 
+    validationResult.errors.push(
+      ...validateComputedFlatFieldMetadata({
+        flatFieldMetadataToValidate,
+        flatFieldMetadataMaps: optimisticFlatFieldMetadataMaps,
+      }),
+    );
+
     const fieldMetadataTypeValidationErrors =
       this.flatFieldMetadataTypeValidatorService.validateFlatFieldMetadataTypeSpecificities(
         {
@@ -421,6 +429,13 @@ export class FlatFieldMetadataValidatorService {
       ...validateFlatFieldMetadataName({
         name: flatFieldMetadataToValidate.name,
         buildOptions,
+      }),
+    );
+
+    validationResult.errors.push(
+      ...validateComputedFlatFieldMetadata({
+        flatFieldMetadataToValidate,
+        flatFieldMetadataMaps: optimisticFlatFieldMetadataMaps,
       }),
     );
 

@@ -3,23 +3,11 @@ import {
   FieldMetadataType,
   type FilterableAndTSVectorFieldType,
 } from '@/types';
-import { mapFormulaOutputTypeToFieldMetadataType } from '@/utils/formula/utils/mapFormulaOutputTypeToFieldMetadataType';
 
 export const getFilterTypeFromFieldType = (
   fieldType: FieldMetadataType,
-  fieldSettings?: AllFieldMetadataSettings | null,
+  _fieldSettings?: AllFieldMetadataSettings | null,
 ): FilterableAndTSVectorFieldType => {
-  if (
-    fieldType === FieldMetadataType.FORMULA &&
-    fieldSettings !== null &&
-    fieldSettings !== undefined &&
-    'outputType' in fieldSettings
-  ) {
-    return getFilterTypeFromFieldType(
-      mapFormulaOutputTypeToFieldMetadataType(fieldSettings.outputType),
-    );
-  }
-
   switch (fieldType) {
     case FieldMetadataType.DATE_TIME:
       return 'DATE_TIME';

@@ -8,6 +8,7 @@ import {
 
 import { FieldMetadataExceptionCode } from 'src/engine/metadata-modules/field-metadata/field-metadata.exception';
 import { type FlatFieldMetadataValidationError } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata-validation-error.type';
+import { getFlatFieldMetadataComputedExpression } from 'src/engine/metadata-modules/flat-field-metadata/utils/get-flat-field-metadata-computed-expression.util';
 import { type UniversalFlatEntityMaps } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-entity-maps.type';
 import { type UniversalFlatFieldMetadata } from 'src/engine/workspace-manager/workspace-migration/universal-flat-entity/types/universal-flat-field-metadata.type';
 
@@ -78,14 +79,16 @@ const isComputedFlatFieldMetadataReferencingField = ({
     return false;
   }
 
+  const computedExpression =
+    getFlatFieldMetadataComputedExpression(universalSettings);
+
   if (
-    candidateFlatFieldMetadata.type === FieldMetadataType.FORMULA &&
-    'expression' in universalSettings &&
+    computedExpression !== null &&
     candidateFlatFieldMetadata.objectMetadataUniversalIdentifier ===
       flatFieldMetadataToMutate.objectMetadataUniversalIdentifier
   ) {
     return isFormulaExpressionReferencingFieldName({
-      expression: universalSettings.expression,
+      expression: computedExpression,
       fieldName: flatFieldMetadataToMutate.name,
     });
   }

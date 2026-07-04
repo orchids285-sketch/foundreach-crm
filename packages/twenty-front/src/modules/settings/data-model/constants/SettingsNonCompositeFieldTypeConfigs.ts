@@ -14,6 +14,10 @@ import {
   type FieldUUidValue,
 } from '@/object-record/record-field/ui/types/FieldMetadata';
 import { DEFAULT_DATE_VALUE } from '@/settings/data-model/constants/DefaultDateValue';
+import {
+  SETTINGS_FIELD_TYPE_FORMULA,
+  type SettingsFieldTypeFormula,
+} from '@/settings/data-model/constants/SettingsFieldTypeFormula';
 import { type SettingsFieldTypeCategoryType } from '@/settings/data-model/types/SettingsFieldTypeCategoryType';
 import { type SettingsNonCompositeFieldType } from '@/settings/data-model/types/SettingsNonCompositeFieldType';
 import { FILE_CATEGORIES, type FieldRatingValue } from 'twenty-shared/types';
@@ -45,7 +49,7 @@ export type SettingsFieldTypeConfig<T> = {
 };
 
 type SettingsNonCompositeFieldTypeConfigArray = Record<
-  SettingsNonCompositeFieldType,
+  SettingsNonCompositeFieldType | SettingsFieldTypeFormula,
   SettingsFieldTypeConfig<any>
 >;
 
@@ -130,7 +134,7 @@ export const SETTINGS_NON_COMPOSITE_FIELD_TYPE_CONFIGS: SettingsNonCompositeFiel
       exampleValues: ['RATING_3', 'RATING_4', 'RATING_5'],
       category: 'Basic',
     } as const satisfies SettingsFieldTypeConfig<FieldRatingValue>,
-    [FieldMetadataType.FORMULA]: {
+    [SETTINGS_FIELD_TYPE_FORMULA]: {
       label: 'Formula',
       Icon: IllustrationIconNumbers,
       exampleValues: ['amount * 0.88', 'price * quantity', 'revenue - cost'],

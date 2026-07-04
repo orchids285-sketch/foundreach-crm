@@ -171,10 +171,7 @@ export class RollupFieldEventsListener {
     const parentIds = new Set<string>();
 
     for (const event of events) {
-      for (const record of [
-        event.properties.after,
-        event.properties.before,
-      ]) {
+      for (const record of [event.properties.after, event.properties.before]) {
         const parentId = record?.[childJoinColumnName];
 
         if (typeof parentId === 'string') {

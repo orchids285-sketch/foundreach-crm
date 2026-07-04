@@ -24,19 +24,19 @@ const createFlatFieldMetadataMaps = (
   ),
 });
 
-const createFormulaFlatFieldMetadata = ({
-  expression,
+const createComputedFlatFieldMetadata = ({
+  computedExpression,
   objectMetadataUniversalIdentifier = SOURCE_OBJECT_UNIVERSAL_IDENTIFIER,
 }: {
-  expression: string;
+  computedExpression: string;
   objectMetadataUniversalIdentifier?: string;
 }): UniversalFlatFieldMetadata =>
   ({
     name: 'computedField',
     universalIdentifier: 'field-computed',
     objectMetadataUniversalIdentifier,
-    type: FieldMetadataType.FORMULA,
-    universalSettings: { expression, outputType: 'NUMBER' },
+    type: FieldMetadataType.NUMBER,
+    universalSettings: { computedExpression },
   }) as UniversalFlatFieldMetadata;
 
 const createRollupFlatFieldMetadata = ({
@@ -63,7 +63,9 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
     const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
       flatFieldMetadataToMutate: sourceFlatFieldMetadata,
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createFormulaFlatFieldMetadata({ expression: 'employees * 2' }),
+        createComputedFlatFieldMetadata({
+          computedExpression: 'employees * 2',
+        }),
       ]),
       shouldCheckRollupReferences: true,
     });
@@ -76,8 +78,8 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
     const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
       flatFieldMetadataToMutate: sourceFlatFieldMetadata,
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createFormulaFlatFieldMetadata({
-          expression: 'employees * 2',
+        createComputedFlatFieldMetadata({
+          computedExpression: 'employees * 2',
           objectMetadataUniversalIdentifier: OTHER_OBJECT_UNIVERSAL_IDENTIFIER,
         }),
       ]),
@@ -91,7 +93,7 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
     const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
       flatFieldMetadataToMutate: sourceFlatFieldMetadata,
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createFormulaFlatFieldMetadata({ expression: 'revenue * 2' }),
+        createComputedFlatFieldMetadata({ computedExpression: 'revenue * 2' }),
       ]),
       shouldCheckRollupReferences: true,
     });
@@ -103,7 +105,7 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
     const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
       flatFieldMetadataToMutate: sourceFlatFieldMetadata,
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createFormulaFlatFieldMetadata({ expression: 'employees +' }),
+        createComputedFlatFieldMetadata({ computedExpression: 'employees +' }),
       ]),
       shouldCheckRollupReferences: true,
     });
@@ -162,7 +164,9 @@ describe('validateFlatFieldMetadataIsNotReferencedByComputedField', () => {
     const errors = validateFlatFieldMetadataIsNotReferencedByComputedField({
       flatFieldMetadataToMutate: sourceFlatFieldMetadata,
       flatFieldMetadataMaps: createFlatFieldMetadataMaps([
-        createFormulaFlatFieldMetadata({ expression: 'employees + 1' }),
+        createComputedFlatFieldMetadata({
+          computedExpression: 'employees + 1',
+        }),
         createRollupFlatFieldMetadata({
           relationFieldMetadataUniversalIdentifier:
             sourceFlatFieldMetadata.universalIdentifier,

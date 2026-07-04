@@ -122,8 +122,17 @@ type SettingsAssertions = [
   Expect<HasAllProperties<RawJsonFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<ActorFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<UUIDFieldMetadata, NotDefinedSettings>>,
-  Expect<HasAllProperties<BooleanFieldMetadata, NotDefinedSettings>>,
 
+  Expect<
+    HasAllProperties<
+      BooleanFieldMetadata,
+      {
+        settings: JsonbProperty<
+          FieldMetadataSettingsMapping[FieldMetadataType.BOOLEAN]
+        >;
+      }
+    >
+  >,
   Expect<
     HasAllProperties<
       TextFieldMetadata,

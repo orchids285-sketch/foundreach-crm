@@ -3,7 +3,6 @@ import { SettingsDataModelPreviewFormCard } from '@/settings/data-model/componen
 import { SettingsDataModelFieldFormulaForm } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
 import { SettingsDataModelFieldPreviewWidget } from '@/settings/data-model/fields/preview/components/SettingsDataModelFieldPreviewWidget';
 import { useFormContext } from 'react-hook-form';
-import { FieldMetadataType } from 'twenty-shared/types';
 
 type SettingsDataModelFieldFormulaSettingsFormCardProps = {
   disabled?: boolean;
@@ -26,7 +25,7 @@ export const SettingsDataModelFieldFormulaSettingsFormCard = ({
             icon: watch('icon'),
             label: watch('label') || t`New Field`,
             settings: watch('settings') || null,
-            type: FieldMetadataType.FORMULA,
+            type: watch('type'),
           }}
           objectNameSingular={objectNameSingular}
         />

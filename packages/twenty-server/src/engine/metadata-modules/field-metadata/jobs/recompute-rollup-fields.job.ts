@@ -85,8 +85,7 @@ export class RecomputeRollupFieldsJob {
     const parentTableName = computeObjectTargetTable(parentFlatObjectMetadata);
     const rollupFilter = rollupFlatFieldMetadata.settings.filter;
     const hasRollupFilter =
-      isDefined(rollupFilter) &&
-      (rollupFilter.recordFilters?.length ?? 0) > 0;
+      isDefined(rollupFilter) && (rollupFilter.recordFilters?.length ?? 0) > 0;
 
     if (!hasRollupFilter) {
       const { sql, parameters } = buildRollupRecomputeSql({

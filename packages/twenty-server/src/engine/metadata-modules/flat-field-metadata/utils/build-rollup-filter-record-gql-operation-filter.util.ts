@@ -68,8 +68,7 @@ export const buildRollupFilterRecordGqlOperationFilter = ({
       RecordFilterGroupLogicalOperator.OR
         ? RecordFilterGroupLogicalOperator.OR
         : RecordFilterGroupLogicalOperator.AND,
-    parentRecordFilterGroupId:
-      chartRecordFilterGroup.parentRecordFilterGroupId,
+    parentRecordFilterGroupId: chartRecordFilterGroup.parentRecordFilterGroupId,
   }));
 
   return computeRecordGqlOperationFilter({

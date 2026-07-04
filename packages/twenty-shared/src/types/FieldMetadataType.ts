@@ -8,7 +8,6 @@ export enum FieldMetadataType {
   DATE_TIME = 'DATE_TIME',
   EMAILS = 'EMAILS',
   FILES = 'FILES',
-  FORMULA = 'FORMULA',
   FULL_NAME = 'FULL_NAME',
   LINKS = 'LINKS',
   MORPH_RELATION = 'MORPH_RELATION',

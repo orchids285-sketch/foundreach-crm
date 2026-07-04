@@ -1,27 +1,34 @@
 import { type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { type FormulaOutputType } from 'twenty-shared/types';
+import {
+  FieldMetadataType,
+  type ComputableFieldMetadataType,
+} from 'twenty-shared/types';
 
 type FormulaDataModelSelectOptions = {
   label: MessageDescriptor;
-  value: FormulaOutputType;
+  value: ComputableFieldMetadataType;
 };
 
 export const FORMULA_DATA_MODEL_SELECT_OPTIONS = [
   {
     label: msg`Number`,
-    value: 'NUMBER',
+    value: FieldMetadataType.NUMBER,
   },
   {
     label: msg`Text`,
-    value: 'TEXT',
+    value: FieldMetadataType.TEXT,
   },
   {
-    label: msg`True or False`,
-    value: 'BOOLEAN',
+    label: msg`True/False`,
+    value: FieldMetadataType.BOOLEAN,
   },
   {
     label: msg`Date and Time`,
-    value: 'DATE_TIME',
+    value: FieldMetadataType.DATE_TIME,
+  },
+  {
+    label: msg`Currency`,
+    value: FieldMetadataType.CURRENCY,
   },
 ] as const satisfies Array<FormulaDataModelSelectOptions>;

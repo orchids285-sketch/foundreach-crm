@@ -1,7 +1,7 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { getFieldComputedExpression } from '@/object-metadata/utils/getFieldComputedExpression';
 import { isFieldMetadataReadOnlyByPermissions } from '@/object-record/read-only/utils/internal/isFieldMetadataReadOnlyByPermissions';
 import { isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission } from '@/object-record/read-only/utils/isOneToManyRelationFieldReadOnlyDueToTargetUpdatePermission';
-import { isFieldFormula } from '@/object-record/record-field/ui/types/guards/isFieldFormula';
 import { isFieldRollup } from '@/object-record/record-field/ui/types/guards/isFieldRollup';
 import { type FieldDefinition } from '@/object-record/record-field/ui/types/FieldDefinition';
 import { type FieldMetadata } from '@/object-record/record-field/ui/types/FieldMetadata';
@@ -46,8 +46,9 @@ export const isRecordFieldReadOnly = ({
       objectPermissionsByObjectMetadataId,
     });
 
-  const isFormulaField =
-    isDefined(fieldDefinition) && isFieldFormula(fieldDefinition);
+  const isComputedField =
+    isDefined(fieldDefinition) &&
+    isDefined(getFieldComputedExpression(fieldDefinition.metadata.settings));
 
   const isRollupField =
     isDefined(fieldDefinition) && isFieldRollup(fieldDefinition);
@@ -60,7 +61,7 @@ export const isRecordFieldReadOnly = ({
   return (
     isRecordReadOnly ||
     isReadOnlyStandardFieldOnSystemObject ||
-    isFormulaField ||
+    isComputedField ||
     isRollupField ||
     !(fieldMetadataItem.isUIEditable ?? true) ||
     fieldReadOnlyByPermissions ||

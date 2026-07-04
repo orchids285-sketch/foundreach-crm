@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { useFieldMetadataItemById } from '@/object-metadata/hooks/useFieldMetadataItemById';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
+import { getFieldComputedExpression } from '@/object-metadata/utils/getFieldComputedExpression';
 import { Separator } from '@/settings/components/Separator';
 import { SettingsOptionCardContentSelect } from '@/settings/components/SettingsOptions/SettingsOptionCardContentSelect';
 import { SettingsDataModelFieldFormulaExpressionEditor } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaExpressionEditor';
@@ -13,20 +14,23 @@ import { buildFormulaFieldReferenceTypes } from '@/settings/data-model/fields/fo
 import { Select } from '@/ui/input/components/Select';
 import { useLingui } from '@lingui/react/macro';
 import {
-  FORMULA_OUTPUT_TYPES,
-  type FormulaOutputType,
+  FieldMetadataType,
+  type ComputableFieldMetadataType,
 } from 'twenty-shared/types';
-import { parseFormulaExpressionOrThrow } from 'twenty-shared/utils';
+import {
+  getExpectedFormulaValueTypeForComputedFieldType,
+  parseFormulaExpressionOrThrow,
+} from 'twenty-shared/utils';
 import { IconEye } from 'twenty-ui/icon';
 
 export const settingsDataModelFieldFormulaFormSchema = z.object({
   settings: z.object({
-    expression: z
+    computedExpression: z
       .string()
       .min(1)
-      .superRefine((expression, ctx) => {
+      .superRefine((computedExpression, ctx) => {
         try {
-          parseFormulaExpressionOrThrow(expression);
+          parseFormulaExpressionOrThrow(computedExpression);
         } catch (error) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -37,13 +41,14 @@ export const settingsDataModelFieldFormulaFormSchema = z.object({
           });
         }
       }),
-    outputType: z.enum(FORMULA_OUTPUT_TYPES),
   }),
 });
 
 export type SettingsDataModelFieldFormulaFormValues = z.infer<
   typeof settingsDataModelFieldFormulaFormSchema
->;
+> & {
+  type: ComputableFieldMetadataType;
+};
 
 type SettingsDataModelFieldFormulaFormProps = {
   disabled?: boolean;
@@ -57,7 +62,8 @@ export const SettingsDataModelFieldFormulaForm = ({
   objectNameSingular,
 }: SettingsDataModelFieldFormulaFormProps) => {
   const { t } = useLingui();
-  const { control } = useFormContext<SettingsDataModelFieldFormulaFormValues>();
+  const { control, watch } =
+    useFormContext<SettingsDataModelFieldFormulaFormValues>();
 
   const { fieldMetadataItem } = useFieldMetadataItemById(
     existingFieldMetadataId,
@@ -76,58 +82,71 @@ export const SettingsDataModelFieldFormulaForm = ({
     [objectMetadataItem, existingFieldMetadataId],
   );
 
-  return (
-    <Controller
-      name="settings"
-      defaultValue={{
-        expression: fieldMetadataItem?.settings?.expression ?? '',
-        outputType: fieldMetadataItem?.settings?.outputType ?? 'NUMBER',
-      }}
-      control={control}
-      render={({ field: { onChange, value } }) => {
-        const expression = value?.expression ?? '';
-        const outputType = value?.outputType ?? 'NUMBER';
+  const chosenFieldType = watch('type');
+  const expectedFormulaValueType =
+    getExpectedFormulaValueTypeForComputedFieldType(chosenFieldType);
 
-        return (
-          <>
-            <SettingsOptionCardContentSelect
-              Icon={IconEye}
-              title={t`Output type`}
-              description={t`Type of the value computed by the formula`}
-            >
-              <Select<FormulaOutputType>
-                selectSizeVariant="small"
-                dropdownId="formula-output-type"
-                dropdownWidth={140}
-                value={outputType}
-                onChange={(value) =>
-                  onChange({ expression, outputType: value })
+  return (
+    <>
+      <Controller
+        name="type"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <SettingsOptionCardContentSelect
+            Icon={IconEye}
+            title={t`Output type`}
+            description={
+              value === FieldMetadataType.CURRENCY
+                ? t`Currency expressions compute the amount in micros`
+                : t`Type of the value computed by the formula`
+            }
+          >
+            <Select<ComputableFieldMetadataType>
+              selectSizeVariant="small"
+              dropdownId="formula-output-type"
+              dropdownWidth={140}
+              value={value}
+              onChange={onChange}
+              disabled={disabled}
+              needIconCheck={false}
+              options={FORMULA_DATA_MODEL_SELECT_OPTIONS.map((option) => ({
+                ...option,
+                label: t(option.label),
+              }))}
+            />
+          </SettingsOptionCardContentSelect>
+        )}
+      />
+      <Separator />
+      <Controller
+        name="settings"
+        defaultValue={{
+          computedExpression:
+            getFieldComputedExpression(fieldMetadataItem?.settings) ?? '',
+        }}
+        control={control}
+        render={({ field: { onChange, value } }) => {
+          const computedExpression = value?.computedExpression ?? '';
+
+          return (
+            <>
+              <SettingsDataModelFieldFormulaExpressionEditor
+                expression={computedExpression}
+                expectedFormulaValueType={expectedFormulaValueType}
+                fieldReferenceTypes={fieldReferenceTypes}
+                onChange={(newExpression) =>
+                  onChange({ computedExpression: newExpression })
                 }
                 disabled={disabled}
-                needIconCheck={false}
-                options={FORMULA_DATA_MODEL_SELECT_OPTIONS.map((option) => ({
-                  ...option,
-                  label: t(option.label),
-                }))}
               />
-            </SettingsOptionCardContentSelect>
-            <Separator />
-            <SettingsDataModelFieldFormulaExpressionEditor
-              expression={expression}
-              outputType={outputType}
-              fieldReferenceTypes={fieldReferenceTypes}
-              onChange={(newExpression) =>
-                onChange({ expression: newExpression, outputType })
-              }
-              disabled={disabled}
-            />
-            <SettingsDataModelFieldFormulaPreview
-              objectNameSingular={objectNameSingular}
-              expression={expression}
-            />
-          </>
-        );
-      }}
-    />
+              <SettingsDataModelFieldFormulaPreview
+                objectNameSingular={objectNameSingular}
+                expression={computedExpression}
+              />
+            </>
+          );
+        }}
+      />
+    </>
   );
 };

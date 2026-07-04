@@ -59,7 +59,9 @@ const computeRollupUniversalSettingsFromSettingsOrThrow = ({
     );
   }
 
-  const targetFlatFieldMetadata = isDefined(updatedSettings.targetFieldMetadataId)
+  const targetFlatFieldMetadata = isDefined(
+    updatedSettings.targetFieldMetadataId,
+  )
     ? findFlatEntityByIdInFlatEntityMaps({
         flatEntityId: updatedSettings.targetFieldMetadataId,
         flatEntityMaps: flatFieldMetadataMaps,

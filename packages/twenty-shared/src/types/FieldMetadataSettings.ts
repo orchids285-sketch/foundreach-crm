@@ -2,7 +2,6 @@ import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
 import { type ChartFilter } from '@/types/page-layout/chart-filter.type';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
-import { type FormulaOutputType } from '@/types/FormulaOutputType';
 import { type IsExactly } from '@/types/IsExactly';
 import { type RelationOnDeleteAction } from '@/types/RelationOnDeleteAction.type';
 import { type RollupAggregateOperation } from '@/types/RollupAggregateOperation';
@@ -25,18 +24,26 @@ export type FieldNumberVariant = 'number' | 'percentage';
 
 export type FieldCurrencyFormat = 'short' | 'full';
 
-type FieldMetadataNumberSettings = {
+// Computation mode: when set, the column is a Postgres generated column derived
+// from same-record fields; the field type stays the representation structure
+type FieldMetadataComputedSettings = {
+  computedExpression?: string;
+};
+
+type FieldMetadataNumberSettings = FieldMetadataComputedSettings & {
   dataType?: NumberDataType;
   decimals?: number;
   type?: FieldNumberVariant;
 };
 
-type FieldMetadataCurrencySettings = {
+type FieldMetadataCurrencySettings = FieldMetadataComputedSettings & {
   format?: FieldCurrencyFormat;
   decimals?: number;
 };
 
-type FieldMetadataTextSettings = {
+type FieldMetadataBooleanSettings = FieldMetadataComputedSettings;
+
+type FieldMetadataTextSettings = FieldMetadataComputedSettings & {
   displayedMaxRows?: number;
 };
 
@@ -44,7 +51,7 @@ type FieldMetadataDateSettings = {
   displayFormat?: DateDisplayFormat;
 };
 
-type FieldMetadataDateTimeSettings = {
+type FieldMetadataDateTimeSettings = FieldMetadataComputedSettings & {
   displayFormat?: DateDisplayFormat;
 };
 
@@ -65,11 +72,6 @@ type FieldMetadataFilesSettings = {
   maxNumberOfValues: number;
 };
 
-export type FieldMetadataFormulaSettings = {
-  expression: string;
-  outputType: FormulaOutputType;
-};
-
 export type FieldMetadataRollupSettings = {
   relationFieldMetadataId: SerializedRelation;
   targetFieldMetadataId: SerializedRelation | null;
@@ -80,6 +82,7 @@ export type FieldMetadataRollupSettings = {
 export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.NUMBER]: FieldMetadataNumberSettings | null;
   [FieldMetadataType.CURRENCY]: FieldMetadataCurrencySettings | null;
+  [FieldMetadataType.BOOLEAN]: FieldMetadataBooleanSettings | null;
   [FieldMetadataType.DATE]: FieldMetadataDateSettings | null;
   [FieldMetadataType.DATE_TIME]: FieldMetadataDateTimeSettings | null;
   [FieldMetadataType.TEXT]: FieldMetadataTextSettings | null;
@@ -92,7 +95,6 @@ export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.LINKS]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.ARRAY]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.FILES]: FieldMetadataFilesSettings;
-  [FieldMetadataType.FORMULA]: FieldMetadataFormulaSettings;
   [FieldMetadataType.ROLLUP]: FieldMetadataRollupSettings;
 };
 

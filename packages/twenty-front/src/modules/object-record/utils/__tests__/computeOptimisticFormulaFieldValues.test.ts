@@ -3,12 +3,12 @@ import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { getMockFieldMetadataItemOrThrow } from '~/testing/utils/getMockFieldMetadataItemOrThrow';
 import { getMockObjectMetadataItemOrThrow } from '~/testing/utils/getMockObjectMetadataItemOrThrow';
 
-const buildCompanyObjectMetadataItemWithFormulaField = ({
-  expression,
-  outputType = 'NUMBER',
+const buildCompanyObjectMetadataItemWithComputedField = ({
+  computedExpression,
+  type = FieldMetadataType.NUMBER,
 }: {
-  expression: string;
-  outputType?: string;
+  computedExpression: string;
+  type?: FieldMetadataType;
 }) => {
   const companyObjectMetadataItem = getMockObjectMetadataItemOrThrow('company');
   const employeesFieldMetadataItem = getMockFieldMetadataItemOrThrow({
@@ -22,11 +22,11 @@ const buildCompanyObjectMetadataItemWithFormulaField = ({
       ...companyObjectMetadataItem.fields,
       {
         ...employeesFieldMetadataItem,
-        id: 'formula-field-id',
+        id: 'computed-field-id',
         name: 'computedValue',
         label: 'Computed Value',
-        type: FieldMetadataType.FORMULA,
-        settings: { expression, outputType },
+        type,
+        settings: { computedExpression },
       },
     ],
   };
@@ -34,8 +34,8 @@ const buildCompanyObjectMetadataItemWithFormulaField = ({
 
 describe('computeOptimisticFormulaFieldValues', () => {
   it('should evaluate a number formula against the edited field value', () => {
-    const objectMetadataItem = buildCompanyObjectMetadataItemWithFormulaField({
-      expression: 'employees * 2',
+    const objectMetadataItem = buildCompanyObjectMetadataItemWithComputedField({
+      computedExpression: 'employees * 2',
     });
 
     const result = computeOptimisticFormulaFieldValues({
@@ -51,8 +51,8 @@ describe('computeOptimisticFormulaFieldValues', () => {
   });
 
   it('should evaluate a formula referencing a composite subfield', () => {
-    const objectMetadataItem = buildCompanyObjectMetadataItemWithFormulaField({
-      expression: 'annualRecurringRevenue.amountMicros / 1000000',
+    const objectMetadataItem = buildCompanyObjectMetadataItemWithComputedField({
+      computedExpression: 'annualRecurringRevenue.amountMicros / 1000000',
     });
 
     const result = computeOptimisticFormulaFieldValues({
@@ -70,9 +70,9 @@ describe('computeOptimisticFormulaFieldValues', () => {
   });
 
   it('should convert DATE_TIME references and serialize Date results to ISO strings', () => {
-    const objectMetadataItem = buildCompanyObjectMetadataItemWithFormulaField({
-      expression: 'createdAt',
-      outputType: 'DATE_TIME',
+    const objectMetadataItem = buildCompanyObjectMetadataItemWithComputedField({
+      computedExpression: 'createdAt',
+      type: FieldMetadataType.DATE_TIME,
     });
 
     const result = computeOptimisticFormulaFieldValues({
@@ -88,8 +88,8 @@ describe('computeOptimisticFormulaFieldValues', () => {
   });
 
   it('should treat undefined referenced values as null', () => {
-    const objectMetadataItem = buildCompanyObjectMetadataItemWithFormulaField({
-      expression: 'employees * 2',
+    const objectMetadataItem = buildCompanyObjectMetadataItemWithComputedField({
+      computedExpression: 'employees * 2',
     });
 
     const result = computeOptimisticFormulaFieldValues({
@@ -102,9 +102,25 @@ describe('computeOptimisticFormulaFieldValues', () => {
     });
   });
 
-  it('should skip a formula field when its expression fails to evaluate', () => {
-    const objectMetadataItem = buildCompanyObjectMetadataItemWithFormulaField({
-      expression: 'employees *',
+  it('should skip a computed field when its expression fails to evaluate', () => {
+    const objectMetadataItem = buildCompanyObjectMetadataItemWithComputedField({
+      computedExpression: 'employees *',
+    });
+
+    const result = computeOptimisticFormulaFieldValues({
+      objectMetadataItem,
+      optimisticRecord: {
+        employees: 21,
+      },
+    });
+
+    expect(result).toEqual({});
+  });
+
+  it('should skip computed CURRENCY fields', () => {
+    const objectMetadataItem = buildCompanyObjectMetadataItemWithComputedField({
+      computedExpression: 'employees * 2',
+      type: FieldMetadataType.CURRENCY,
     });
 
     const result = computeOptimisticFormulaFieldValues({

@@ -56,6 +56,8 @@ export {
   richTextValueSchema,
 } from './composite-types/rich-text.composite-type';
 export type { CompositeFieldSubFieldName } from './CompositeFieldSubFieldNameType';
+export type { ComputableFieldMetadataType } from './ComputableFieldMetadataType';
+export { COMPUTABLE_FIELD_METADATA_TYPES } from './ComputableFieldMetadataType';
 export type { ConfigVariableValue } from './ConfigVariableValue';
 export type { ConfirmationModalCaller } from './ConfirmationModalCaller';
 export { ConnectedAccountProvider } from './ConnectedAccountProvider';
@@ -111,7 +113,6 @@ export {
 export type {
   FieldNumberVariant,
   FieldCurrencyFormat,
-  FieldMetadataFormulaSettings,
   FieldMetadataRollupSettings,
   FieldMetadataSettingsMapping,
   AllFieldMetadataSettings,
@@ -131,8 +132,6 @@ export type {
 export { FILTERABLE_FIELD_TYPES } from './FilterableFieldType';
 export { FirstDayOfTheWeek } from './FirstDayOfTheWeek';
 export type { FormatRecordSerializedRelationProperties } from './FormatRecordSerializedRelationProperties.type';
-export type { FormulaOutputType } from './FormulaOutputType';
-export { FORMULA_OUTPUT_TYPES } from './FormulaOutputType';
 export type { FromTo } from './FromToType';
 export { HTTPMethod } from './HttpMethod';
 export type { IndexOf } from './IndexOf.type';

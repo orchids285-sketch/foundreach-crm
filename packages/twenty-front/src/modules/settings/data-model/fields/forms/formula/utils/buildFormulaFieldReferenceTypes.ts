@@ -1,4 +1,5 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { getFieldComputedExpression } from '@/object-metadata/utils/getFieldComputedExpression';
 import { compositeTypeDefinitions } from 'twenty-shared/types';
 import {
   computeFormulaFieldReferenceKey,
@@ -6,17 +7,16 @@ import {
   mapFieldMetadataTypeToFormulaValueType,
   type FormulaValueType,
 } from 'twenty-shared/utils';
-import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 export const buildFormulaFieldReferenceTypes = ({
   fieldMetadataItems,
 }: {
-  fieldMetadataItems: Pick<FieldMetadataItem, 'name' | 'type'>[];
+  fieldMetadataItems: Pick<FieldMetadataItem, 'name' | 'type' | 'settings'>[];
 }): Record<string, FormulaValueType> => {
   const fieldReferenceTypes: Record<string, FormulaValueType> = {};
 
   for (const fieldMetadataItem of fieldMetadataItems) {
-    if (fieldMetadataItem.type === FieldMetadataType.FORMULA) {
+    if (isDefined(getFieldComputedExpression(fieldMetadataItem.settings))) {
       continue;
     }
 

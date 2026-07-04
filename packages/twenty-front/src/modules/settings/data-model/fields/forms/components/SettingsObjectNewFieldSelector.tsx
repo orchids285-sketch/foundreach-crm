@@ -3,6 +3,7 @@ import { SettingsCard } from '@/settings/components/SettingsCard';
 import { SETTINGS_FIELD_TYPE_CATEGORIES } from '@/settings/data-model/constants/SettingsFieldTypeCategories';
 import { SETTINGS_FIELD_TYPE_CATEGORY_DESCRIPTIONS } from '@/settings/data-model/constants/SettingsFieldTypeCategoryDescriptions';
 import { SETTINGS_FIELD_TYPE_CONFIGS } from '@/settings/data-model/constants/SettingsFieldTypeConfigs';
+import { SETTINGS_FIELD_TYPE_FORMULA } from '@/settings/data-model/constants/SettingsFieldTypeFormula';
 import { type SettingsFieldTypeConfig } from '@/settings/data-model/constants/SettingsNonCompositeFieldTypeConfigs';
 import { useBooleanSettingsFormInitialValues } from '@/settings/data-model/fields/forms/boolean/hooks/useBooleanSettingsFormInitialValues';
 import { useCurrencySettingsFormInitialValues } from '@/settings/data-model/fields/forms/currency/hooks/useCurrencySettingsFormInitialValues';
@@ -85,8 +86,8 @@ export const SettingsObjectNewFieldSelector = ({
     SETTINGS_FIELD_TYPE_CONFIGS,
   ).filter(
     ([key, config]) =>
-      !excludedFieldTypes.includes(key as SettingsFieldType) &&
-      ((key !== FieldMetadataType.FORMULA &&
+      !excludedFieldTypes.includes(key as FieldType) &&
+      ((key !== SETTINGS_FIELD_TYPE_FORMULA &&
         key !== FieldMetadataType.ROLLUP) ||
         isFormulaFieldsEnabled) &&
       config.label.toLowerCase().includes(searchQuery.toLowerCase()),

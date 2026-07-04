@@ -5,7 +5,6 @@ import { type CurrencyCode } from 'twenty-shared/constants';
 import {
   ConnectedAccountProvider,
   type AllowedAddressSubField,
-  type FieldMetadataFormulaSettings,
   type FieldMetadataMultiItemSettings,
   type FieldMetadataRollupSettings,
   type FileCategory,
@@ -25,13 +24,17 @@ export type FieldUuidMetadata = BaseFieldMetadata & {
   settings?: null;
 };
 
+export type FieldComputedMetadataSettings = {
+  computedExpression?: string;
+};
+
 export type FieldBooleanMetadata = BaseFieldMetadata & {
-  settings?: null;
+  settings?: FieldComputedMetadataSettings | null;
 };
 
 export type FieldTextMetadata = BaseFieldMetadata & {
   placeHolder: string;
-  settings?: {
+  settings?: FieldComputedMetadataSettings & {
     displayedMaxRows?: number;
   };
 };
@@ -56,7 +59,7 @@ export type FieldDateMetadataSettings =
 
 export type FieldDateTimeMetadata = BaseFieldMetadata & {
   placeHolder: string;
-  settings?: FieldDateMetadataSettings;
+  settings?: FieldDateMetadataSettings & FieldComputedMetadataSettings;
 };
 
 export type FieldDateMetadata = BaseFieldMetadata & {
@@ -74,7 +77,7 @@ export type FieldNumberVariant = (typeof FIELD_NUMBER_VARIANT)[number];
 export type FieldNumberMetadata = BaseFieldMetadata & {
   placeHolder: string;
   isPositive?: boolean;
-  settings?: {
+  settings?: FieldComputedMetadataSettings & {
     decimals?: number;
     type?: FieldNumberVariant;
   };
@@ -92,7 +95,7 @@ export type FieldLinksMetadata = BaseFieldMetadata & {
 export type FieldCurrencyMetadata = BaseFieldMetadata & {
   placeHolder: string;
   isPositive?: boolean;
-  settings?: {
+  settings?: FieldComputedMetadataSettings & {
     format: FieldCurrencyFormat | null;
     decimals?: number;
   };
@@ -201,10 +204,6 @@ export type FieldFilesMetadata = BaseFieldMetadata & {
   settings?: FieldMetadataMultiItemSettings | null;
 };
 
-export type FieldFormulaMetadata = BaseFieldMetadata & {
-  settings?: FieldMetadataFormulaSettings | null;
-};
-
 export type FieldRollupMetadata = BaseFieldMetadata & {
   settings?: FieldMetadataRollupSettings | null;
 };
@@ -217,7 +216,6 @@ export type FieldMetadata =
   | FieldEmailMetadata
   | FieldEmailsMetadata
   | FieldFilesMetadata
-  | FieldFormulaMetadata
   | FieldRollupMetadata
   | FieldFullNameMetadata
   | FieldLinkMetadata
@@ -245,7 +243,6 @@ export type FieldDateTimeValue = string | null;
 export type FieldDateValue = string | null;
 export type FieldNumberValue = number | null;
 export type FieldBooleanValue = boolean;
-export type FieldFormulaValue = number | string | boolean | null;
 export type FieldRollupValue = number | null;
 
 export type FieldEmailsValue = {

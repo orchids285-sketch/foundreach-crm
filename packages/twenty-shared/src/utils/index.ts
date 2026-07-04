@@ -190,6 +190,7 @@ export { evaluateFormulaNumericAggregate } from './formula/utils/evaluateFormula
 export { evaluateFormulaOrThrow } from './formula/utils/evaluateFormulaOrThrow';
 export { evaluateFormulaSwitch } from './formula/utils/evaluateFormulaSwitch';
 export { extractFormulaFieldReferences } from './formula/utils/extractFormulaFieldReferences';
+export { getExpectedFormulaValueTypeForComputedFieldType } from './formula/utils/getExpectedFormulaValueTypeForComputedFieldType';
 export { getFormulaDateAddUnitSecondsOrThrow } from './formula/utils/getFormulaDateAddUnitSecondsOrThrow';
 export { inferDatePartFunctionReturnTypeOrThrow } from './formula/utils/inferDatePartFunctionReturnTypeOrThrow';
 export { inferFormulaReturnTypeOrThrow } from './formula/utils/inferFormulaReturnTypeOrThrow';
@@ -199,8 +200,8 @@ export { inferTextFunctionReturnTypeOrThrow } from './formula/utils/inferTextFun
 export { inferTextSliceFunctionReturnTypeOrThrow } from './formula/utils/inferTextSliceFunctionReturnTypeOrThrow';
 export { inferVariadicNumericFunctionReturnTypeOrThrow } from './formula/utils/inferVariadicNumericFunctionReturnTypeOrThrow';
 export { isBlankFormulaValue } from './formula/utils/isBlankFormulaValue';
+export { isComputableFieldMetadataType } from './formula/utils/isComputableFieldMetadataType';
 export { mapFieldMetadataTypeToFormulaValueType } from './formula/utils/mapFieldMetadataTypeToFormulaValueType';
-export { mapFormulaOutputTypeToFieldMetadataType } from './formula/utils/mapFormulaOutputTypeToFieldMetadataType';
 export { parseFormulaExpressionOrThrow } from './formula/utils/parseFormulaExpressionOrThrow';
 export { roundHalfAwayFromZero } from './formula/utils/roundHalfAwayFromZero';
 export { tokenizeFormulaExpressionOrThrow } from './formula/utils/tokenizeFormulaExpressionOrThrow';

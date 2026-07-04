@@ -4,6 +4,7 @@ import { dispatchObjectRecordOperationBrowserEvent } from '@/browser-event/utils
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { generateUpdateOneRecordMutation } from '@/object-metadata/utils/generateUpdateOneRecordMutation';
+import { getFieldComputedExpression } from '@/object-metadata/utils/getFieldComputedExpression';
 import { getObjectTypename } from '@/object-record/cache/utils/getObjectTypename';
 import { getRecordFromCache } from '@/object-record/cache/utils/getRecordFromCache';
 import { getRecordFromRecordNode } from '@/object-record/cache/utils/getRecordFromRecordNode';
@@ -24,7 +25,6 @@ import { sanitizeRecordInput } from '@/object-record/utils/sanitizeRecordInput';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isNull } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
-import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { buildRecordFromKeysWithSameValue } from '~/utils/array/buildRecordFromKeysWithSameValue';
 
 type UpdateOneRecordArgs<UpdatedObjectRecord> = {
@@ -100,12 +100,12 @@ export const useUpdateOneRecord = () => {
       computeReferences: false,
     });
 
-    const objectMetadataItemHasFormulaFields = objectMetadataItem.fields.some(
-      ({ type }) => type === FieldMetadataType.FORMULA,
+    const objectMetadataItemHasComputedFields = objectMetadataItem.fields.some(
+      ({ settings }) => isDefined(getFieldComputedExpression(settings)),
     );
 
     const optimisticRecordInputWithFormulaFieldValues =
-      objectMetadataItemHasFormulaFields
+      objectMetadataItemHasComputedFields
         ? {
             ...optimisticRecordInput,
             ...computeOptimisticFormulaFieldValues({

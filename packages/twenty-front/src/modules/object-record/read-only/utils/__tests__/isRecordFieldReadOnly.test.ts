@@ -87,7 +87,7 @@ describe('isRecordFieldReadOnly', () => {
     expect(result).toBe(false);
   });
 
-  it('should return true when field is a formula field', () => {
+  it('should return true when field settings carry a computed expression', () => {
     const result = isRecordFieldReadOnly({
       ...mockParams,
       fieldMetadataItem: {
@@ -96,16 +96,40 @@ describe('isRecordFieldReadOnly', () => {
       },
       fieldDefinition: {
         fieldMetadataId: 'field-123',
-        label: 'Formula',
+        label: 'Computed Value',
         iconName: 'IconMathFunction',
-        type: FieldMetadataType.FORMULA,
+        type: FieldMetadataType.NUMBER,
         metadata: {
-          fieldName: 'formula',
+          fieldName: 'computedValue',
+          settings: {
+            computedExpression: 'amount * 2',
+          },
         },
       },
     });
 
     expect(result).toBe(true);
+  });
+
+  it('should return false when field settings have no computed expression', () => {
+    const result = isRecordFieldReadOnly({
+      ...mockParams,
+      fieldMetadataItem: {
+        id: 'field-123',
+        isUIEditable: true,
+      },
+      fieldDefinition: {
+        fieldMetadataId: 'field-123',
+        label: 'Amount',
+        iconName: 'IconNumber9',
+        type: FieldMetadataType.NUMBER,
+        metadata: {
+          fieldName: 'amount',
+        },
+      },
+    });
+
+    expect(result).toBe(false);
   });
 
   it('should return true when field is a rollup field', () => {

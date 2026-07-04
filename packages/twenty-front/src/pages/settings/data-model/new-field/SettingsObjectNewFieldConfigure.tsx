@@ -4,6 +4,10 @@ import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilte
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { SettingsWizardStepBar } from '@/settings/components/layout/SettingsWizardStepBar';
 import { FIELD_NAME_MAXIMUM_LENGTH } from '@/settings/data-model/constants/FieldNameMaximumLength';
+import {
+  SETTINGS_FIELD_TYPE_FORMULA,
+  type SettingsFieldTypeFormula,
+} from '@/settings/data-model/constants/SettingsFieldTypeFormula';
 import { SettingsObjectNewFieldHeaderIcon } from '@/settings/data-model/fields/components/SettingsObjectNewFieldHeaderIcon';
 import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldIconLabelForm';
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
@@ -48,8 +52,9 @@ export const SettingsObjectNewFieldConfigure = () => {
   const { objectNamePlural = '' } = useParams();
   const [searchParams] = useSearchParams();
   const fieldType =
-    (searchParams.get('fieldType') as FieldMetadataType) ||
-    FieldMetadataType.TEXT;
+    (searchParams.get('fieldType') as
+      | FieldMetadataType
+      | SettingsFieldTypeFormula) || FieldMetadataType.TEXT;
   const { enqueueErrorSnackBar } = useSnackBar();
 
   const { findObjectMetadataItemByNamePlural } =
@@ -69,7 +74,10 @@ export const SettingsObjectNewFieldConfigure = () => {
       }),
     ),
     defaultValues: {
-      type: fieldType,
+      type:
+        fieldType === SETTINGS_FIELD_TYPE_FORMULA
+          ? FieldMetadataType.NUMBER
+          : fieldType,
       icon:
         DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ?? DEFAULT_ICON_FOR_NEW_FIELD,
       label: '',

@@ -7,11 +7,11 @@ describe('getFormulaExpressionMarkers', () => {
     city: 'TEXT',
   };
 
-  it('should return no markers for a valid expression matching the output type', () => {
+  it('should return no markers for a valid expression matching the expected type', () => {
     expect(
       getFormulaExpressionMarkers({
         expression: 'amount * 0.88',
-        outputType: 'NUMBER',
+        expectedFormulaValueType: 'NUMBER',
         fieldReferenceTypes,
       }),
     ).toEqual([]);
@@ -21,7 +21,7 @@ describe('getFormulaExpressionMarkers', () => {
     expect(
       getFormulaExpressionMarkers({
         expression: '  ',
-        outputType: 'NUMBER',
+        expectedFormulaValueType: 'NUMBER',
         fieldReferenceTypes,
       }),
     ).toEqual([]);
@@ -30,7 +30,7 @@ describe('getFormulaExpressionMarkers', () => {
   it('should mark an unknown field reference', () => {
     const markers = getFormulaExpressionMarkers({
       expression: 'unknownField * 2',
-      outputType: 'NUMBER',
+      expectedFormulaValueType: 'NUMBER',
       fieldReferenceTypes,
     });
 
@@ -38,23 +38,23 @@ describe('getFormulaExpressionMarkers', () => {
     expect(markers[0].message).toBe("Unknown field 'unknownField'");
   });
 
-  it('should mark a mismatch between the inferred return type and the output type', () => {
+  it('should mark a mismatch between the inferred return type and the expected type', () => {
     const markers = getFormulaExpressionMarkers({
       expression: 'amount * 2',
-      outputType: 'TEXT',
+      expectedFormulaValueType: 'TEXT',
       fieldReferenceTypes,
     });
 
     expect(markers).toHaveLength(1);
     expect(markers[0].message).toBe(
-      'Formula returns NUMBER but the field output type is TEXT',
+      'Formula returns NUMBER but the field expects TEXT',
     );
   });
 
   it('should position a parse error marker at the reported offset', () => {
     const markers = getFormulaExpressionMarkers({
       expression: 'amount +\n@',
-      outputType: 'NUMBER',
+      expectedFormulaValueType: 'NUMBER',
       fieldReferenceTypes,
     });
 

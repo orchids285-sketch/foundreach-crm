@@ -1,5 +1,4 @@
 import { type editor } from 'monaco-editor';
-import { type FormulaOutputType } from 'twenty-shared/types';
 import {
   inferFormulaReturnTypeOrThrow,
   parseFormulaExpressionOrThrow,
@@ -44,11 +43,11 @@ const computeRangeFromOffset = (
 
 export const getFormulaExpressionMarkers = ({
   expression,
-  outputType,
+  expectedFormulaValueType,
   fieldReferenceTypes,
 }: {
   expression: string;
-  outputType: FormulaOutputType;
+  expectedFormulaValueType: FormulaValueType;
   fieldReferenceTypes: Record<string, FormulaValueType>;
 }): editor.IMarkerData[] => {
   if (expression.trim().length === 0) {
@@ -62,11 +61,14 @@ export const getFormulaExpressionMarkers = ({
       fieldReferenceTypes,
     });
 
-    if (inferredReturnType !== 'NULL' && inferredReturnType !== outputType) {
+    if (
+      inferredReturnType !== 'NULL' &&
+      inferredReturnType !== expectedFormulaValueType
+    ) {
       return [
         {
           severity: MONACO_MARKER_SEVERITY_ERROR,
-          message: `Formula returns ${inferredReturnType} but the field output type is ${outputType}`,
+          message: `Formula returns ${inferredReturnType} but the field expects ${expectedFormulaValueType}`,
           ...computeFullExpressionRange(expression),
         },
       ];

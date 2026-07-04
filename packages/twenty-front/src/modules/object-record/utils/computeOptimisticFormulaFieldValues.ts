@@ -1,6 +1,6 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
+import { getFieldComputedExpression } from '@/object-metadata/utils/getFieldComputedExpression';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
-import { isNonEmptyString } from '@sniptt/guards';
 import {
   computeFormulaFieldReferenceKey,
   evaluateFormulaOrThrow,
@@ -20,16 +20,19 @@ export const computeOptimisticFormulaFieldValues = ({
 }): Partial<ObjectRecord> => {
   const formulaFieldValues: Partial<ObjectRecord> = {};
 
-  const activeFormulaFieldMetadataItems = objectMetadataItem.fields.filter(
+  const activeComputedFieldMetadataItems = objectMetadataItem.fields.filter(
     (fieldMetadataItem) =>
-      fieldMetadataItem.type === FieldMetadataType.FORMULA &&
-      fieldMetadataItem.isActive,
+      fieldMetadataItem.isActive &&
+      fieldMetadataItem.type !== FieldMetadataType.CURRENCY &&
+      isDefined(getFieldComputedExpression(fieldMetadataItem.settings)),
   );
 
-  for (const formulaFieldMetadataItem of activeFormulaFieldMetadataItems) {
-    const expression = formulaFieldMetadataItem.settings?.expression;
+  for (const computedFieldMetadataItem of activeComputedFieldMetadataItems) {
+    const expression = getFieldComputedExpression(
+      computedFieldMetadataItem.settings,
+    );
 
-    if (!isNonEmptyString(expression)) {
+    if (!isDefined(expression)) {
       continue;
     }
 
@@ -67,7 +70,7 @@ export const computeOptimisticFormulaFieldValues = ({
         fieldValuesByFieldReferenceKey,
       });
 
-      formulaFieldValues[formulaFieldMetadataItem.name] =
+      formulaFieldValues[computedFieldMetadataItem.name] =
         formulaResult instanceof Date
           ? formulaResult.toISOString()
           : formulaResult;
