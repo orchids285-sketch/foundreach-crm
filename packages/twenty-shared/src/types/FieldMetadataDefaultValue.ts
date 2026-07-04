@@ -118,6 +118,7 @@ export const FIELD_METADATA_TYPES_WITHOUT_DEFAULT_VALUE = [
   FieldMetadataType.FILES,
   FieldMetadataType.TS_VECTOR,
   FieldMetadataType.FORMULA,
+  FieldMetadataType.ROLLUP,
 ] as const satisfies FieldMetadataType[];
 
 export const isFieldMetadataTypeWithDefaultValue = (

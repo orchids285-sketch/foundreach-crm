@@ -1,3 +1,4 @@
+import { type AllFieldMetadataSettings } from '@/types/FieldMetadataSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
 import { type PartialFieldMetadataItemOption } from '@/types/PartialFieldMetadataOption';
 
@@ -7,4 +8,5 @@ export type PartialFieldMetadataItem = {
   type: FieldMetadataType;
   label: string;
   options?: PartialFieldMetadataItemOption[] | null;
+  settings?: AllFieldMetadataSettings | null;
 };

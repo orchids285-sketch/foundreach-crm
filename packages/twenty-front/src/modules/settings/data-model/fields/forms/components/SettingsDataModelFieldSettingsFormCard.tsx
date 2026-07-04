@@ -18,6 +18,8 @@ import { SettingsDataModelFieldDateSettingsFormCard } from '@/settings/data-mode
 import { settingsDataModelFieldFormulaFormSchema } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
 import { SettingsDataModelFieldFormulaSettingsFormCard } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaSettingsFormCard';
 import { settingsDataModelFieldMorphRelationFormSchema } from '@/settings/data-model/fields/forms/morph-relation/components/SettingsDataModelFieldRelationForm';
+import { settingsDataModelFieldRollupFormSchema } from '@/settings/data-model/fields/forms/rollup/components/SettingsDataModelFieldRollupForm';
+import { SettingsDataModelFieldRollupSettingsFormCard } from '@/settings/data-model/fields/forms/rollup/components/SettingsDataModelFieldRollupSettingsFormCard';
 import { settingsDataModelFieldNumberFormSchema } from '@/settings/data-model/fields/forms/number/components/SettingsDataModelFieldNumberForm';
 import { SettingsDataModelFieldNumberSettingsFormCard } from '@/settings/data-model/fields/forms/number/components/SettingsDataModelFieldNumberSettingsFormCard';
 import { settingsDataModelFieldPhonesFormSchema } from '@/settings/data-model/fields/forms/phones/components/SettingsDataModelFieldPhonesForm';
@@ -133,6 +135,10 @@ const formulaFieldFormSchema = z
   .object({ type: z.literal(FieldMetadataType.FORMULA) })
   .extend(settingsDataModelFieldFormulaFormSchema.shape);
 
+const rollupFieldFormSchema = z
+  .object({ type: z.literal(FieldMetadataType.ROLLUP) })
+  .extend(settingsDataModelFieldRollupFormSchema.shape);
+
 const otherFieldsFormSchema = z
   .object({
     type: z.enum(
@@ -155,6 +161,7 @@ const otherFieldsFormSchema = z
           FieldMetadataType.ARRAY,
           FieldMetadataType.FILES,
           FieldMetadataType.FORMULA,
+          FieldMetadataType.ROLLUP,
         ]),
       ) as [FieldMetadataType, ...FieldMetadataType[]],
     ),
@@ -181,6 +188,7 @@ export const settingsDataModelFieldSettingsFormSchema = z.discriminatedUnion(
     arrayFieldFormSchema,
     filesFieldFormSchema,
     formulaFieldFormSchema,
+    rollupFieldFormSchema,
     otherFieldsFormSchema,
   ],
 );
@@ -212,6 +220,7 @@ const previewableTypes = [
   FieldMetadataType.RELATION,
   FieldMetadataType.MORPH_RELATION,
   FieldMetadataType.RICH_TEXT,
+  FieldMetadataType.ROLLUP,
   FieldMetadataType.SELECT,
   FieldMetadataType.TEXT,
   FieldMetadataType.UUID,
@@ -289,6 +298,16 @@ export const SettingsDataModelFieldSettingsFormCard = ({
   if (fieldType === FieldMetadataType.FORMULA) {
     return (
       <SettingsDataModelFieldFormulaSettingsFormCard
+        existingFieldMetadataId={existingFieldMetadataId}
+        objectNameSingular={objectNameSingular}
+        disabled={disabled}
+      />
+    );
+  }
+
+  if (fieldType === FieldMetadataType.ROLLUP) {
+    return (
+      <SettingsDataModelFieldRollupSettingsFormCard
         existingFieldMetadataId={existingFieldMetadataId}
         objectNameSingular={objectNameSingular}
         disabled={disabled}

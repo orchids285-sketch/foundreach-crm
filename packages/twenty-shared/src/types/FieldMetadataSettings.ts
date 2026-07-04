@@ -4,6 +4,7 @@ import { type FieldMetadataType } from '@/types/FieldMetadataType';
 import { type FormulaOutputType } from '@/types/FormulaOutputType';
 import { type IsExactly } from '@/types/IsExactly';
 import { type RelationOnDeleteAction } from '@/types/RelationOnDeleteAction.type';
+import { type RollupAggregateOperation } from '@/types/RollupAggregateOperation';
 import { type RelationType } from '@/types/RelationType';
 import { type SerializedRelation } from '@/types/SerializedRelation.type';
 
@@ -68,6 +69,12 @@ export type FieldMetadataFormulaSettings = {
   outputType: FormulaOutputType;
 };
 
+export type FieldMetadataRollupSettings = {
+  relationFieldMetadataId: string;
+  targetFieldMetadataId: string | null;
+  aggregateOperation: RollupAggregateOperation;
+};
+
 export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.NUMBER]: FieldMetadataNumberSettings | null;
   [FieldMetadataType.CURRENCY]: FieldMetadataCurrencySettings | null;
@@ -84,6 +91,7 @@ export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.ARRAY]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.FILES]: FieldMetadataFilesSettings;
   [FieldMetadataType.FORMULA]: FieldMetadataFormulaSettings;
+  [FieldMetadataType.ROLLUP]: FieldMetadataRollupSettings;
 };
 
 export type AllFieldMetadataSettings =

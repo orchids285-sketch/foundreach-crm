@@ -11,8 +11,13 @@ import {
   computeCompositeColumnName,
 } from 'src/engine/metadata-modules/field-metadata/utils/compute-column-name.util';
 import { getCompositeTypeOrThrow } from 'src/engine/metadata-modules/field-metadata/utils/get-composite-type-or-throw.util';
+import { isCompositeFieldMetadataType } from 'src/engine/metadata-modules/field-metadata/utils/is-composite-field-metadata-type.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
-import { isCompositeFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-composite-flat-field-metadata.util';
+
+export type FormulaReferenceSourceFieldMetadata = Pick<
+  FlatFieldMetadata,
+  'name' | 'type'
+>;
 
 export type FormulaFieldReferencesContext = {
   fieldReferenceTypes: Record<string, FormulaValueType>;
@@ -22,7 +27,7 @@ export type FormulaFieldReferencesContext = {
 export const buildFormulaFieldReferencesContext = ({
   siblingFlatFieldMetadatas,
 }: {
-  siblingFlatFieldMetadatas: FlatFieldMetadata[];
+  siblingFlatFieldMetadatas: FormulaReferenceSourceFieldMetadata[];
 }): FormulaFieldReferencesContext => {
   const fieldReferenceTypes: Record<string, FormulaValueType> = {};
   const columnNameByFieldReferenceKey: Record<string, string> = {};
@@ -32,7 +37,7 @@ export const buildFormulaFieldReferencesContext = ({
       continue;
     }
 
-    if (isCompositeFlatFieldMetadata(flatFieldMetadata)) {
+    if (isCompositeFieldMetadataType(flatFieldMetadata.type)) {
       const compositeType = getCompositeTypeOrThrow(flatFieldMetadata.type);
 
       for (const compositeProperty of compositeType.properties) {

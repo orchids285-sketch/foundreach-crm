@@ -19,6 +19,7 @@ export const isNonCompositeField = (type: FieldType) => {
     FieldMetadataType.RAW_JSON,
     FieldMetadataType.ARRAY,
     FieldMetadataType.FORMULA,
+    FieldMetadataType.ROLLUP,
   ].includes(type as any);
 
   return fieldIsSimpleValue;

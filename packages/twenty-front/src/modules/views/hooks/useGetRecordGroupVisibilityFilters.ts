@@ -65,6 +65,7 @@ export const useGetRecordGroupVisibilityFilters =
 
     const filterType = getFilterTypeFromFieldType(
       mainGroupByFieldMetadataItem?.type ?? FieldMetadataType.SELECT,
+      mainGroupByFieldMetadataItem?.settings,
     );
 
     return {

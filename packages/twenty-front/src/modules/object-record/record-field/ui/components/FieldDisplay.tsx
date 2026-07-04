@@ -12,6 +12,7 @@ import { PhonesFieldDisplay } from '@/object-record/record-field/ui/meta-types/d
 import { RatingFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/RatingFieldDisplay';
 import { RelationFromManyFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/RelationFromManyFieldDisplay';
 import { RichTextFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/RichTextFieldDisplay';
+import { RollupFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/RollupFieldDisplay';
 import { isFieldIdentifierDisplay } from '@/object-record/record-field/ui/meta-types/display/utils/isFieldIdentifierDisplay';
 import { isFieldActor } from '@/object-record/record-field/ui/types/guards/isFieldActor';
 import { isFieldArray } from '@/object-record/record-field/ui/types/guards/isFieldArray';
@@ -23,6 +24,7 @@ import { isFieldLinks } from '@/object-record/record-field/ui/types/guards/isFie
 import { isFieldPhones } from '@/object-record/record-field/ui/types/guards/isFieldPhones';
 import { isFieldRating } from '@/object-record/record-field/ui/types/guards/isFieldRating';
 import { isFieldRichText } from '@/object-record/record-field/ui/types/guards/isFieldRichText';
+import { isFieldRollup } from '@/object-record/record-field/ui/types/guards/isFieldRollup';
 
 import { MorphRelationManyToOneFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/MorphRelationManyToOneFieldDisplay';
 import { MorphRelationOneToManyFieldDisplay } from '@/object-record/record-field/ui/meta-types/display/components/MorphRelationOneToManyFieldDisplay';
@@ -114,6 +116,8 @@ export const FieldDisplay = () => {
     <RatingFieldDisplay readonly={isRecordFieldReadOnly} />
   ) : isFieldFormula(fieldDefinition) ? (
     <FormulaFieldDisplay />
+  ) : isFieldRollup(fieldDefinition) ? (
+    <RollupFieldDisplay />
   ) : isFieldRichText(fieldDefinition) ? (
     <RichTextFieldDisplay />
   ) : isFieldActor(fieldDefinition) ? (

@@ -5,12 +5,16 @@ type FieldMetadataTypesNotTestedForFilterInputValidation =
   | 'POSITION'
   | 'ACTOR'
   | 'NUMERIC'
-  | 'RICH_TEXT';
+  | 'RICH_TEXT'
+  | 'FORMULA'
+  | 'ROLLUP';
 
 type FieldMetadataTypesNotTestedForCreateInputValidation =
   | 'TS_VECTOR'
   | 'ACTOR'
-  | 'NUMERIC';
+  | 'NUMERIC'
+  | 'FORMULA'
+  | 'ROLLUP';
 
 export type FieldMetadataTypesToTestForCreateInputValidation = Exclude<
   FieldMetadataType,

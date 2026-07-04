@@ -92,6 +92,7 @@ export const useBuildSpreadsheetImportFields = () => {
       case FieldMetadataType.ACTOR:
       case FieldMetadataType.TS_VECTOR:
       case FieldMetadataType.FORMULA:
+      case FieldMetadataType.ROLLUP:
         return [];
 
       default:

@@ -108,6 +108,12 @@ export class TypeMapperService {
       });
     }
 
+    if (fieldMetadataType === FieldMetadataType.ROLLUP) {
+      return this.mapToPreBuiltGraphQLOutputType({
+        fieldMetadataType: FieldMetadataType.NUMBER,
+      });
+    }
+
     return this.baseTypeScalarMapping.get(fieldMetadataType);
   }
 
@@ -138,6 +144,12 @@ export class TypeMapperService {
       return this.mapToPreBuiltGraphQLInputType({
         fieldMetadataType:
           this.getFormulaOutputFieldMetadataTypeFromOptions(typeOptions),
+      });
+    }
+
+    if (fieldMetadataType === FieldMetadataType.ROLLUP) {
+      return this.mapToPreBuiltGraphQLInputType({
+        fieldMetadataType: FieldMetadataType.NUMBER,
       });
     }
 
@@ -222,6 +234,10 @@ export class TypeMapperService {
       );
     }
 
+    if (fieldMetadataType === FieldMetadataType.ROLLUP) {
+      return this.mapToFilterType(FieldMetadataType.NUMBER);
+    }
+
     return typeFilterMapping.get(fieldMetadataType);
   }
 
@@ -247,6 +263,7 @@ export class TypeMapperService {
       [FieldMetadataType.ARRAY, OrderByDirectionType],
       [FieldMetadataType.TS_VECTOR, OrderByDirectionType], // TODO: Add TSVectorOrderByType
       [FieldMetadataType.FORMULA, OrderByDirectionType],
+      [FieldMetadataType.ROLLUP, OrderByDirectionType],
     ]);
 
     return typeOrderByMapping.get(fieldMetadataType);

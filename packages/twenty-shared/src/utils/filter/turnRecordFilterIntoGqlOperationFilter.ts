@@ -7,6 +7,7 @@ import {
   ViewFilterOperand as RecordFilterOperand,
   type ActorFilter,
   type AddressFilter,
+  type AllFieldMetadataSettings,
   type ArrayFilter,
   type BooleanFilter,
   type CurrencyFilter,
@@ -74,6 +75,7 @@ export type FieldShared = {
   type: FieldMetadataType;
   label: string;
   morphRelations?: FieldSharedMorphRelation[] | null;
+  settings?: AllFieldMetadataSettings | null;
 };
 
 type TurnRecordFilterIntoRecordGqlOperationFilterParams = {
@@ -204,7 +206,7 @@ const buildDirectFieldGqlOperationFilter = ({
 
   const isSubFieldFilter = isNonEmptyString(subFieldName);
 
-  const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type);
+  const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type, fieldMetadataItem.settings);
 
   switch (filterType) {
     case 'TEXT':

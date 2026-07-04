@@ -1,4 +1,5 @@
 import {
+  type AllFieldMetadataSettings,
   type FieldMetadataType,
   type FilterableAndTSVectorFieldType,
   type ViewFilterOperand,
@@ -11,7 +12,10 @@ export const checkIfShouldComputeEmptinessFilter = ({
   correspondingFieldMetadataItem,
 }: {
   recordFilterOperand: ViewFilterOperand;
-  correspondingFieldMetadataItem: { type: FieldMetadataType };
+  correspondingFieldMetadataItem: {
+    type: FieldMetadataType;
+    settings?: AllFieldMetadataSettings | null;
+  };
 }) => {
   const isAnEmptinessOperand = isEmptinessOperand(recordFilterOperand);
 
@@ -24,6 +28,7 @@ export const checkIfShouldComputeEmptinessFilter = ({
 
   const filterType = getFilterTypeFromFieldType(
     correspondingFieldMetadataItem.type,
+    correspondingFieldMetadataItem.settings,
   );
 
   const filterHasEmptinessOperands =

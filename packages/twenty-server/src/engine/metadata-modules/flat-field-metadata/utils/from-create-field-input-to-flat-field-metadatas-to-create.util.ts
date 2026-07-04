@@ -185,6 +185,7 @@ export const fromCreateFieldInputToFlatFieldMetadatasToCreate = async ({
     case FieldMetadataType.RICH_TEXT:
     case FieldMetadataType.ACTOR:
     case FieldMetadataType.FORMULA:
+    case FieldMetadataType.ROLLUP:
     case FieldMetadataType.ARRAY: {
       return {
         status: 'success',

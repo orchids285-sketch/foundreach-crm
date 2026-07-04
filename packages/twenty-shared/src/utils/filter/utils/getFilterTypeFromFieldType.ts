@@ -31,6 +31,8 @@ export const getFilterTypeFromFieldType = (
       return 'FULL_NAME';
     case FieldMetadataType.NUMBER:
       return 'NUMBER';
+    case FieldMetadataType.ROLLUP:
+      return 'NUMBER';
     case FieldMetadataType.CURRENCY:
       return 'CURRENCY';
     case FieldMetadataType.EMAILS:

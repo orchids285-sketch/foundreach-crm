@@ -243,6 +243,7 @@ describe('WorkspaceEntityManager', () => {
         IS_LOGIC_FUNCTION_PREBUILT_MODE_ENABLED: false,
         IS_SETTINGS_DISCOVERY_HERO_ENABLED: false,
         IS_MESSAGING_CALENDAR_WEBHOOK_ENABLED: false,
+        IS_FORMULA_FIELDS_ENABLED: false,
       },
       userWorkspaceRoleMap: {},
       apiKeyRoleMap: {},

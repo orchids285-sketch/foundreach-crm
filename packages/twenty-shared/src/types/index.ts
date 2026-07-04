@@ -112,6 +112,7 @@ export type {
   FieldNumberVariant,
   FieldCurrencyFormat,
   FieldMetadataFormulaSettings,
+  FieldMetadataRollupSettings,
   FieldMetadataSettingsMapping,
   AllFieldMetadataSettings,
   FieldMetadataSettings,
@@ -273,6 +274,8 @@ export type { RelationUpdatePayload } from './RelationUpdatePayload';
 export type { RemoveSuffix } from './RemoveSuffix.type';
 export type { RestrictedFieldPermissions } from './RestrictedFieldPermissions';
 export type { RestrictedFieldsPermissions } from './RestrictedFieldsPermissions';
+export type { RollupAggregateOperation } from './RollupAggregateOperation';
+export { ROLLUP_AGGREGATE_OPERATIONS } from './RollupAggregateOperation';
 export type { RowLevelPermissionPredicate } from './RowLevelPermissionPredicate';
 export type { RowLevelPermissionPredicateGroup } from './RowLevelPermissionPredicateGroup';
 export { RowLevelPermissionPredicateGroupLogicalOperator } from './RowLevelPermissionPredicateGroupLogicalOperator';

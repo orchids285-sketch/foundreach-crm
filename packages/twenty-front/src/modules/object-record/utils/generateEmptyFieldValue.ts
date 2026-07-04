@@ -126,6 +126,9 @@ export const generateEmptyFieldValue = ({
     case FieldMetadataType.FORMULA: {
       return null;
     }
+    case FieldMetadataType.ROLLUP: {
+      return null;
+    }
     default: {
       return assertUnreachable(
         fieldMetadataItem.type,

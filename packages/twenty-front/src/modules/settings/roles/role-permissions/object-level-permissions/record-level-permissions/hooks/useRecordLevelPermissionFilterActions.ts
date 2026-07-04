@@ -75,7 +75,7 @@ export const useRecordLevelPermissionFilterActions = ({
         firstField.label.localeCompare(secondField.label),
       )
       .filter((fieldMetadataItem) => {
-        const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type);
+        const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type, fieldMetadataItem.settings);
 
         return !isCompositeFieldType(filterType);
       });
@@ -140,6 +140,7 @@ export const useRecordLevelPermissionFilterActions = ({
 
     const filterType = getFilterTypeFromFieldType(
       defaultFieldMetadataItemForRLS.type,
+      defaultFieldMetadataItemForRLS.settings,
     );
 
     const defaultSubFieldName =

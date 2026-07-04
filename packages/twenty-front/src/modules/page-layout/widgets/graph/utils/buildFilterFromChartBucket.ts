@@ -129,7 +129,7 @@ export const buildFilterFromChartBucket = ({
   }
 
   const availableOperands = getRecordFilterOperands({
-    filterType: getFilterTypeFromFieldType(fieldMetadataItem.type),
+    filterType: getFilterTypeFromFieldType(fieldMetadataItem.type, fieldMetadataItem.settings),
     subFieldName: subFieldName ?? undefined,
   });
 

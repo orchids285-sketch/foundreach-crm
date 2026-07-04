@@ -19,7 +19,8 @@ export const isFieldMetadataSettingsOfType = <
     fieldMetadataType === FieldMetadataType.RELATION ||
     fieldMetadataType === FieldMetadataType.MORPH_RELATION ||
     fieldMetadataType === FieldMetadataType.FILES ||
-    fieldMetadataType === FieldMetadataType.FORMULA
+    fieldMetadataType === FieldMetadataType.FORMULA ||
+    fieldMetadataType === FieldMetadataType.ROLLUP
   ) {
     return isDefined(settings);
   }
@@ -39,7 +40,8 @@ export const isUniversalFieldMetadataSettingsOftype = <
     fieldMetadataType === FieldMetadataType.RELATION ||
     fieldMetadataType === FieldMetadataType.MORPH_RELATION ||
     fieldMetadataType === FieldMetadataType.FILES ||
-    fieldMetadataType === FieldMetadataType.FORMULA
+    fieldMetadataType === FieldMetadataType.FORMULA ||
+    fieldMetadataType === FieldMetadataType.ROLLUP
   ) {
     return isDefined(settings);
   }

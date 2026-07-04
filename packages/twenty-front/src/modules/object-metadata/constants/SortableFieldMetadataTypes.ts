@@ -16,4 +16,5 @@ export const SORTABLE_FIELD_METADATA_TYPES = [
   FieldMetadataType.PHONES,
   FieldMetadataType.ADDRESS,
   FieldMetadataType.FORMULA,
+  FieldMetadataType.ROLLUP,
 ];

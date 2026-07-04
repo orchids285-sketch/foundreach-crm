@@ -17,7 +17,9 @@ import { computeCompositeColumnName } from 'src/engine/metadata-modules/field-me
 import { getCompositeTypeOrThrow } from 'src/engine/metadata-modules/field-metadata/utils/get-composite-type-or-throw.util';
 import { findFlatEntityByIdInFlatEntityMapsOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps-or-throw.util';
 import { findManyFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-many-flat-entity-by-id-in-flat-entity-maps.util';
+import { buildRollupRecomputeSql } from 'src/engine/metadata-modules/flat-field-metadata/utils/build-rollup-recompute-sql.util';
 import { deriveFormulaAsExpressionForFormulaField } from 'src/engine/metadata-modules/flat-field-metadata/utils/derive-formula-as-expression-for-formula-field.util';
+import { resolveRollupSqlContextOrThrow } from 'src/engine/metadata-modules/flat-field-metadata/utils/resolve-rollup-sql-context.util';
 import { findFlatEntityByUniversalIdentifierOrThrow } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-universal-identifier-or-throw.util';
 import { findFieldRelatedIndexes } from 'src/engine/metadata-modules/flat-field-metadata/utils/find-field-related-index.util';
 import { FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
@@ -391,6 +393,38 @@ export class UpdateFieldActionHandlerService extends WorkspaceMigrationRunnerAct
         tableName,
         columnDefinitions,
       });
+    }
+
+    if (
+      update.settings !== undefined &&
+      isFlatFieldMetadataOfType(
+        optimisticFlatFieldMetadata,
+        FieldMetadataType.ROLLUP,
+      )
+    ) {
+      const {
+        rollupColumnName,
+        childTableName,
+        childJoinColumnName,
+        childTargetColumnName,
+        aggregateOperation,
+      } = resolveRollupSqlContextOrThrow({
+        rollupFlatFieldMetadata: optimisticFlatFieldMetadata,
+        flatFieldMetadataMaps,
+        flatObjectMetadataMaps,
+      });
+
+      const { sql, parameters } = buildRollupRecomputeSql({
+        parentSchemaName: schemaName,
+        parentTableName: tableName,
+        rollupColumnName,
+        childTableName,
+        childJoinColumnName,
+        childTargetColumnName,
+        aggregateOperation,
+      });
+
+      await queryRunner.query(sql, parameters);
     }
 
     if (

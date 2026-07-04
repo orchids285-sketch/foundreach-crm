@@ -108,6 +108,27 @@ describe('isRecordFieldReadOnly', () => {
     expect(result).toBe(true);
   });
 
+  it('should return true when field is a rollup field', () => {
+    const result = isRecordFieldReadOnly({
+      ...mockParams,
+      fieldMetadataItem: {
+        id: 'field-123',
+        isUIEditable: true,
+      },
+      fieldDefinition: {
+        fieldMetadataId: 'field-123',
+        label: 'Rollup',
+        iconName: 'IconSum',
+        type: FieldMetadataType.ROLLUP,
+        metadata: {
+          fieldName: 'rollup',
+        },
+      },
+    });
+
+    expect(result).toBe(true);
+  });
+
   it('should return true when field is from the standard application on a system object', () => {
     const result = isRecordFieldReadOnly({
       ...mockParams,

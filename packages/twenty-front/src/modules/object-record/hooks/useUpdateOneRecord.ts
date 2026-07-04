@@ -16,6 +16,7 @@ import { useObjectPermissions } from '@/object-record/hooks/useObjectPermissions
 import { useRefetchAggregateQueries } from '@/object-record/hooks/useRefetchAggregateQueries';
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { computeOptimisticFormulaFieldValues } from '@/object-record/utils/computeOptimisticFormulaFieldValues';
 import { computeOptimisticRecordFromInput } from '@/object-record/utils/computeOptimisticRecordFromInput';
 import { getUpdatedFieldsFromRecordInput } from '@/object-record/utils/getUpdatedFieldsFromRecordInput';
 import { getUpdateOneRecordMutationResponseField } from '@/object-record/utils/getUpdateOneRecordMutationResponseField';
@@ -23,6 +24,7 @@ import { sanitizeRecordInput } from '@/object-record/utils/sanitizeRecordInput';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isNull } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
+import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { buildRecordFromKeysWithSameValue } from '~/utils/array/buildRecordFromKeysWithSameValue';
 
 type UpdateOneRecordArgs<UpdatedObjectRecord> = {
@@ -98,9 +100,24 @@ export const useUpdateOneRecord = () => {
       computeReferences: false,
     });
 
+    const objectMetadataItemHasFormulaFields = objectMetadataItem.fields.some(
+      ({ type }) => type === FieldMetadataType.FORMULA,
+    );
+
+    const optimisticRecordInputWithFormulaFieldValues =
+      objectMetadataItemHasFormulaFields
+        ? {
+            ...optimisticRecordInput,
+            ...computeOptimisticFormulaFieldValues({
+              objectMetadataItem,
+              optimisticRecord: { ...cachedRecord, ...optimisticRecordInput },
+            }),
+          }
+        : optimisticRecordInput;
+
     const computedOptimisticRecord = {
       ...cachedRecord,
-      ...optimisticRecordInput,
+      ...optimisticRecordInputWithFormulaFieldValues,
       id: idToUpdate,
       __typename: getObjectTypename(objectMetadataItem.nameSingular),
     };
@@ -123,7 +140,7 @@ export const useUpdateOneRecord = () => {
       const recordGqlFields = generateDepthRecordGqlFieldsFromRecord({
         objectMetadataItem,
         objectMetadataItems,
-        record: optimisticRecordInput,
+        record: optimisticRecordInputWithFormulaFieldValues,
         depth: 1,
       });
 
@@ -198,7 +215,7 @@ export const useUpdateOneRecord = () => {
         }
         const cachedRecordKeys = new Set(Object.keys(cachedRecord));
         const recordKeysAddedByOptimisticCache = Object.keys(
-          optimisticRecordInput,
+          optimisticRecordInputWithFormulaFieldValues,
         ).filter((diffKey) => !cachedRecordKeys.has(diffKey));
 
         const recordGqlFields = {
@@ -240,7 +257,7 @@ export const useUpdateOneRecord = () => {
         });
 
         const optimisticallyUpdatedFieldsToRestore = Object.keys(
-          optimisticRecordInput,
+          optimisticRecordInputWithFormulaFieldValues,
         ).reduce<Partial<ObjectRecord>>(
           (restoredFields, fieldName) => ({
             ...restoredFields,
