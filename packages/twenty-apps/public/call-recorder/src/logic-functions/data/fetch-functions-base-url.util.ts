@@ -14,7 +14,8 @@ type ClientConfigResponse = {
 // deployment has no public function domain (self-hosting), where /s stays
 // served.
 export const fetchFunctionsBaseUrl = async (): Promise<string | undefined> => {
-  const injectedFunctionsUrl = process.env[TWENTY_FUNCTIONS_URL_ENV_VAR_NAME];
+  const injectedFunctionsUrl =
+    process.env[TWENTY_FUNCTIONS_URL_ENV_VAR_NAME]?.trim();
 
   if (isNonEmptyString(injectedFunctionsUrl)) {
     return injectedFunctionsUrl;

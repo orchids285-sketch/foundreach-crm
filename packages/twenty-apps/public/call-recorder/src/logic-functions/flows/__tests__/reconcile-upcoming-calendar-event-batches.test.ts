@@ -118,18 +118,12 @@ describe('reconcileUpcomingCalendarEventBatches', () => {
     });
   });
 
-  it('records a failed batch and keeps processing the next one', async () => {
+  it('re-queues a failed batch once and reconciles it in a later batch', async () => {
     const calendarEventIds = buildCalendarEventIds(30);
 
-    reconcileCallRecorderForCalendarEventIdsMock
-      .mockRejectedValueOnce(new Error('core api unavailable'))
-      .mockResolvedValueOnce([
-        {
-          action: 'UPDATED',
-          realMeetingKey: 'link:meet.example.com/xyz:2026-07-06T10:00:00.000Z',
-          callRecordingId: 'call-recording-2',
-        },
-      ]);
+    reconcileCallRecorderForCalendarEventIdsMock.mockRejectedValueOnce(
+      new Error('core api unavailable'),
+    );
 
     const result = await reconcileUpcomingCalendarEventBatches({
       client: CLIENT,
@@ -137,18 +131,37 @@ describe('reconcileUpcomingCalendarEventBatches', () => {
       deadlineAtMs: Date.now() + 60_000,
     });
 
-    expect(result.failedCalendarEventIds).toEqual(calendarEventIds.slice(0, 25));
-    expect(result.reconciledCalendarEventIds).toEqual(
-      calendarEventIds.slice(25),
+    expect(reconcileCallRecorderForCalendarEventIdsMock).toHaveBeenCalledTimes(
+      3,
     );
+    expect(result.failedCalendarEventIds).toEqual([]);
+    expect(result.reconciledCalendarEventIds).toEqual([
+      ...calendarEventIds.slice(25),
+      ...calendarEventIds.slice(0, 25),
+    ]);
     expect(result.remainingCalendarEventIds).toEqual([]);
-    expect(result.actionCounts).toEqual({
-      created: 0,
-      updated: 1,
-      canceled: 0,
-      skipped: 0,
-      failed: 0,
+    expect(result.continuationRequested).toBe(false);
+  });
+
+  it('drops an id after its second failed batch instead of retrying forever', async () => {
+    const calendarEventIds = buildCalendarEventIds(30);
+
+    reconcileCallRecorderForCalendarEventIdsMock.mockRejectedValue(
+      new Error('core api unavailable'),
+    );
+
+    const result = await reconcileUpcomingCalendarEventBatches({
+      client: CLIENT,
+      calendarEventIds,
+      deadlineAtMs: Date.now() + 60_000,
     });
+
+    expect(reconcileCallRecorderForCalendarEventIdsMock).toHaveBeenCalledTimes(
+      3,
+    );
+    expect(result.reconciledCalendarEventIds).toEqual([]);
+    expect(result.failedCalendarEventIds).toEqual(calendarEventIds);
+    expect(result.remainingCalendarEventIds).toEqual([]);
     expect(result.continuationRequested).toBe(false);
   });
 

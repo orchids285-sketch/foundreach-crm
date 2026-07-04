@@ -41,11 +41,14 @@ export const reconcileUpcomingCalendarEventBatches = async ({
     skipped: 0,
     failed: 0,
   };
+  const failureCountByCalendarEventId = new Map<string, number>();
   let slowestBatchMs = 0;
 
-  // Process at least one batch per run so the continuation payload strictly shrinks.
+  // Each id is re-queued at most once after a failed batch, so the loop and
+  // the continuation chain stay bounded even when reconciliation keeps
+  // failing.
   while (remainingCalendarEventIds.length > 0) {
-    const batchCalendarEventIds = remainingCalendarEventIds.slice(
+    const batchCalendarEventIds = remainingCalendarEventIds.splice(
       0,
       UPCOMING_CALENDAR_EVENT_RECONCILIATION_BATCH_SIZE,
     );
@@ -66,7 +69,21 @@ export const reconcileUpcomingCalendarEventBatches = async ({
         ] += 1;
       }
     } catch (error) {
-      failedCalendarEventIds.push(...batchCalendarEventIds);
+      // A transient error must not drop events from the sweep: give every id
+      // in the batch one more chance at the end of the queue before it is
+      // recorded as failed.
+      for (const calendarEventId of batchCalendarEventIds) {
+        const failureCount =
+          (failureCountByCalendarEventId.get(calendarEventId) ?? 0) + 1;
+
+        failureCountByCalendarEventId.set(calendarEventId, failureCount);
+
+        if (failureCount === 1) {
+          remainingCalendarEventIds.push(calendarEventId);
+        } else {
+          failedCalendarEventIds.push(calendarEventId);
+        }
+      }
 
       if (process.env.NODE_ENV !== 'test') {
         console.error(
@@ -75,7 +92,6 @@ export const reconcileUpcomingCalendarEventBatches = async ({
       }
     }
 
-    remainingCalendarEventIds.splice(0, batchCalendarEventIds.length);
     slowestBatchMs = Math.max(slowestBatchMs, getNowMs() - batchStartedAtMs);
 
     if (getNowMs() + slowestBatchMs > deadlineAtMs) {

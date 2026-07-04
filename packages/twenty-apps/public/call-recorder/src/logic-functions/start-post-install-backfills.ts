@@ -10,9 +10,16 @@ import { SummaryBackfillKickoffOutcome } from 'src/logic-functions/constants/sum
 import { requestCallRecordingSummariesBackfill } from 'src/logic-functions/data/request-call-recording-summaries-backfill.util';
 import { requestUpcomingCalendarEventsReconciliation } from 'src/logic-functions/data/request-upcoming-calendar-events-reconciliation.util';
 
+type SweepOutcomes = typeof CalendarEventSweepKickoffOutcome;
+type BackfillOutcomes = typeof SummaryBackfillKickoffOutcome;
+
+// Failures are represented by the throw below, so the result only carries the
+// success outcomes.
 type StartPostInstallBackfillsResult = {
-  calendarEventSweepOutcome: CalendarEventSweepKickoffOutcome;
-  summaryBackfillOutcome: SummaryBackfillKickoffOutcome;
+  calendarEventSweepOutcome: SweepOutcomes['SWEEP_REQUESTED'];
+  summaryBackfillOutcome:
+    | BackfillOutcomes['SKIPPED_INITIAL_INSTALL']
+    | BackfillOutcomes['BACKFILL_REQUESTED'];
 };
 
 export const startPostInstallBackfillsHandler = async ({
@@ -27,15 +34,21 @@ export const startPostInstallBackfillsHandler = async ({
       ? SummaryBackfillKickoffOutcome.BACKFILL_REQUESTED
       : SummaryBackfillKickoffOutcome.BACKFILL_REQUEST_FAILED;
 
-  const failedKickoffs = [
-    ...(calendarEventSweepRequested ? [] : ['upcoming calendar event sweep']),
-    ...(summaryBackfillOutcome ===
-    SummaryBackfillKickoffOutcome.BACKFILL_REQUEST_FAILED
-      ? ['call recording summary backfill']
-      : []),
-  ];
+  if (
+    !calendarEventSweepRequested ||
+    summaryBackfillOutcome ===
+      SummaryBackfillKickoffOutcome.BACKFILL_REQUEST_FAILED
+  ) {
+    const failedKickoffs = [
+      ...(calendarEventSweepRequested
+        ? []
+        : ['upcoming calendar event sweep']),
+      ...(summaryBackfillOutcome ===
+      SummaryBackfillKickoffOutcome.BACKFILL_REQUEST_FAILED
+        ? ['call recording summary backfill']
+        : []),
+    ];
 
-  if (failedKickoffs.length > 0) {
     throw new Error(
       `[call-recorder] Failed to start post-install backfills: ${failedKickoffs.join(
         ', ',
@@ -44,9 +57,7 @@ export const startPostInstallBackfillsHandler = async ({
   }
 
   return {
-    calendarEventSweepOutcome: calendarEventSweepRequested
-      ? CalendarEventSweepKickoffOutcome.SWEEP_REQUESTED
-      : CalendarEventSweepKickoffOutcome.SWEEP_REQUEST_FAILED,
+    calendarEventSweepOutcome: CalendarEventSweepKickoffOutcome.SWEEP_REQUESTED,
     summaryBackfillOutcome,
   };
 };
