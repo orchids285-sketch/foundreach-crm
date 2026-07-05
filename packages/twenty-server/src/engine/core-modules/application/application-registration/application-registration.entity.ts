@@ -218,7 +218,12 @@ export class ApplicationRegistrationEntity {
 
   @Field(() => String, { nullable: true })
   get logoUrl(): string | null {
-    return this.logo ?? this.manifest?.application?.logoUrl ?? null;
+    return (
+      this.logo ??
+      this.manifest?.application?.logoPath ??
+      this.manifest?.application?.logoUrl ??
+      null
+    );
   }
 
   @OneToMany(

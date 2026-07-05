@@ -9,6 +9,7 @@ import {
   ApplicationRegistrationExceptionCode,
 } from 'src/engine/core-modules/application/application-registration/application-registration.exception';
 import { ApplicationRegistrationVariableService } from 'src/engine/core-modules/application/application-registration-variable/application-registration-variable.service';
+import { toGalleryImagePaths } from 'src/engine/core-modules/application/application-registration/utils/to-gallery-image-paths.util';
 import {
   type ApplicationRegistrationCatalogCard,
   ApplicationRegistrationService,
@@ -152,7 +153,7 @@ export class MarketplaceQueryService {
         undefined,
       screenshots: isNonEmptyArray(registration.screenshots)
         ? registration.screenshots
-        : (registration.manifest?.application?.screenshots ?? []),
+        : toGalleryImagePaths(registration.manifest?.application),
       defaultRoleUniversalIdentifier:
         registration.manifest?.application?.defaultRoleUniversalIdentifier,
       roles: registration.manifest?.roles?.map((role) =>
