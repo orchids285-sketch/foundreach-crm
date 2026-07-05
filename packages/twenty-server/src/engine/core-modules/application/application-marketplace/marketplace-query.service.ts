@@ -109,6 +109,10 @@ export class MarketplaceQueryService {
   private toMarketplaceAppDetailDTO(
     registration: ApplicationRegistrationEntity,
   ): MarketplaceAppDetailDTO {
+    const galleryImagePaths = isNonEmptyArray(registration.screenshots)
+      ? registration.screenshots
+      : toGalleryImagePaths(registration.manifest?.application);
+
     return {
       id: registration.id,
       universalIdentifier: registration.universalIdentifier,
@@ -151,9 +155,8 @@ export class MarketplaceQueryService {
         registration.issueReportUrl ??
         registration.manifest?.application?.issueReportUrl ??
         undefined,
-      screenshots: isNonEmptyArray(registration.screenshots)
-        ? registration.screenshots
-        : toGalleryImagePaths(registration.manifest?.application),
+      screenshots: galleryImagePaths,
+      galleryImages: galleryImagePaths,
       defaultRoleUniversalIdentifier:
         registration.manifest?.application?.defaultRoleUniversalIdentifier,
       roles: registration.manifest?.roles?.map((role) =>
