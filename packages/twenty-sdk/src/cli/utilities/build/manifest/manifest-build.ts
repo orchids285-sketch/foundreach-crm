@@ -9,6 +9,7 @@ import { extractManifestFromFile } from '@/cli/utilities/build/manifest/manifest
 import { addMissingFieldOptionIds } from '@/cli/utilities/build/manifest/utils/add-missing-field-option-ids';
 import { fromRoleConfigToRoleManifest } from '@/cli/utilities/build/manifest/utils/from-role-config-to-role-manifest';
 import { getDefaultFieldsInObjectFields } from '@/cli/utilities/build/manifest/utils/get-default-fields-in-object-fields';
+import { normalizeApplicationAssets } from '@/cli/utilities/build/manifest/utils/normalize-application-assets';
 import { validateConditionalAvailabilityUsage } from '@/cli/utilities/build/manifest/utils/validate-conditional-availability-usage';
 import { validateViewFilterOperands } from '@/cli/utilities/build/manifest/utils/validate-view-filter-operands';
 import { type ApplicationConfig, type LogicFunctionConfig } from '@/sdk/define';
@@ -558,22 +559,42 @@ export const buildManifest = async (
     }),
   );
 
+  const assetNormalization = applicationConfig
+    ? normalizeApplicationAssets(applicationConfig)
+    : undefined;
+
+  if (assetNormalization) {
+    warnings.push(...assetNormalization.warnings);
+  }
+
   const application: ApplicationManifest | undefined =
     applicationConfig && resolvedDefaultRoleUniversalIdentifier
-      ? {
-          ...applicationConfig,
-          defaultRoleUniversalIdentifier:
-            resolvedDefaultRoleUniversalIdentifier,
-          aboutDescription: readmeContent,
-          yarnLockChecksum: null,
-          packageJsonChecksum: null,
-          ...(postInstallLogicFunctions.length >= 1
-            ? { postInstallLogicFunction: postInstallLogicFunctions[0] }
-            : {}),
-          ...(preInstallLogicFunctions.length >= 1
-            ? { preInstallLogicFunction: preInstallLogicFunctions[0] }
-            : {}),
-        }
+      ? (() => {
+          // Drop the deprecated asset fields from the spread — they are
+          // replaced by the normalized `logoPath` / `galleryImages`.
+          const {
+            logoUrl: _logoUrl,
+            screenshots: _screenshots,
+            ...applicationConfigRest
+          } = applicationConfig;
+
+          return {
+            ...applicationConfigRest,
+            logoPath: assetNormalization?.logoPath,
+            galleryImages: assetNormalization?.galleryImages ?? [],
+            defaultRoleUniversalIdentifier:
+              resolvedDefaultRoleUniversalIdentifier,
+            aboutDescription: readmeContent,
+            yarnLockChecksum: null,
+            packageJsonChecksum: null,
+            ...(postInstallLogicFunctions.length >= 1
+              ? { postInstallLogicFunction: postInstallLogicFunctions[0] }
+              : {}),
+            ...(preInstallLogicFunctions.length >= 1
+              ? { preInstallLogicFunction: preInstallLogicFunctions[0] }
+              : {}),
+          };
+        })()
       : undefined;
 
   const byId = <T extends { universalIdentifier: string }>(a: T, b: T) =>

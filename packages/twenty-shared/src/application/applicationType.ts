@@ -1,4 +1,5 @@
 import { type ApplicationVariables } from './applicationVariablesType';
+import { type GalleryImageManifest } from './galleryImageManifestType';
 import { type ServerVariables } from './server-variables.type';
 import { type SyncableEntityOptions } from './syncableEntityOptionsType';
 import { type PostInstallLogicFunctionApplicationManifest } from '@/application/postInstallLogicFunctionApplicationType';
@@ -12,8 +13,19 @@ export type ApplicationManifest = SyncableEntityOptions & {
   serverVariables?: ServerVariables;
   author?: string;
   category?: string;
+  /**
+   * @deprecated Use `logoPath`, a path into the app `public/` folder. External
+   * URLs are no longer supported: they are warned about and ignored at build
+   * and ingest time. Kept for backward compatibility with older manifests.
+   */
   logoUrl?: string;
+  logoPath?: string;
+  /**
+   * @deprecated Use `galleryImages`. Each entry is treated as a `public/` folder
+   * path and assigned an incremental position. External URLs are ignored.
+   */
   screenshots?: string[];
+  galleryImages?: GalleryImageManifest[];
   aboutDescription?: string;
   websiteUrl?: string;
   termsUrl?: string;
