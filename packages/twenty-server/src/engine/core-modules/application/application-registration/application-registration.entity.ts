@@ -19,6 +19,7 @@ import {
 
 import { UUIDScalarType } from 'src/engine/api/graphql/workspace-schema-builder/graphql-types/scalars';
 import { type Manifest } from 'twenty-shared/application';
+import { ApplicationGalleryImageEntity } from 'src/engine/core-modules/application/application-gallery-image/application-gallery-image.entity';
 import { ApplicationRegistrationVariableEntity } from 'src/engine/core-modules/application/application-registration-variable/application-registration-variable.entity';
 import { ApplicationRegistrationSourceType } from 'src/engine/core-modules/application/application-registration/enums/application-registration-source-type.enum';
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
@@ -141,6 +142,17 @@ export class ApplicationRegistrationEntity {
   })
   logo: string | null;
 
+  @Column({ nullable: true, type: 'uuid' })
+  @WasIntroducedInUpgrade({
+    upgradeCommandName:
+      '2.19.0_AddLogoFileIdToApplicationRegistrationFastInstanceCommand_1783090000000',
+  })
+  logoFileId: string | null;
+
+  @OneToOne(() => FileEntity, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'logoFileId' })
+  logoFile: Relation<FileEntity> | null;
+
   @Column({ nullable: true, type: 'text' })
   @WasIntroducedInUpgrade({
     upgradeCommandName:
@@ -215,6 +227,13 @@ export class ApplicationRegistrationEntity {
     { onDelete: 'CASCADE' },
   )
   variables: Relation<ApplicationRegistrationVariableEntity[]>;
+
+  @OneToMany(
+    () => ApplicationGalleryImageEntity,
+    (galleryImage) => galleryImage.applicationRegistration,
+    { onDelete: 'CASCADE' },
+  )
+  galleryImages: Relation<ApplicationGalleryImageEntity[]>;
 
   @Field()
   @CreateDateColumn({ type: 'timestamptz' })

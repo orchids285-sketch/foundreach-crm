@@ -54,6 +54,7 @@ const APPLICATION_REGISTRATION_WITHOUT_MANIFEST_SELECT: (keyof ApplicationRegist
     'isFeatured',
     'isPreInstalled',
     'logo',
+    'logoFileId',
     'description',
     'author',
     'category',

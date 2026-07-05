@@ -97,6 +97,8 @@ import { AddLogoToApplicationRegistrationFastInstanceCommand } from './2-19/2-19
 import { BackfillLogoOnApplicationRegistrationSlowInstanceCommand } from './2-19/2-19-instance-command-slow-1783069673191-backfill-logo-on-application-registration';
 import { AddDisplayFieldsToApplicationRegistrationFastInstanceCommand } from './2-19/2-19-instance-command-fast-1783073776590-add-display-fields-to-application-registration';
 import { BackfillDisplayFieldsOnApplicationRegistrationSlowInstanceCommand } from './2-19/2-19-instance-command-slow-1783073776591-backfill-display-fields-on-application-registration';
+import { AddLogoFileIdToApplicationRegistrationFastInstanceCommand } from './2-19/2-19-instance-command-fast-1783090000000-add-logo-file-id-to-application-registration';
+import { CreateApplicationGalleryImageCoreTableFastInstanceCommand } from './2-19/2-19-instance-command-fast-1783090000001-create-application-gallery-image-core-table';
 
 export const INSTANCE_COMMANDS = [
   AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand,
@@ -196,4 +198,6 @@ export const INSTANCE_COMMANDS = [
   AddDisplayFieldsToApplicationRegistrationFastInstanceCommand,
   BackfillDisplayFieldsOnApplicationRegistrationSlowInstanceCommand,
   AddStatusToFileFastInstanceCommand,
+  AddLogoFileIdToApplicationRegistrationFastInstanceCommand,
+  CreateApplicationGalleryImageCoreTableFastInstanceCommand,
 ];

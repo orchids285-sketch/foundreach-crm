@@ -15,6 +15,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { ApplicationGalleryImageEntity } from 'src/engine/core-modules/application/application-gallery-image/application-gallery-image.entity';
 import { ApplicationRegistrationEntity } from 'src/engine/core-modules/application/application-registration/application-registration.entity';
 import { ApplicationRegistrationSourceType } from 'src/engine/core-modules/application/application-registration/enums/application-registration-source-type.enum';
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
@@ -70,6 +71,13 @@ export class ApplicationEntity extends WorkspaceRelatedEntity {
   @OneToOne(() => FileEntity, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'logoFileId' })
   logoFile: Relation<FileEntity> | null;
+
+  @OneToMany(
+    () => ApplicationGalleryImageEntity,
+    (galleryImage) => galleryImage.application,
+    { onDelete: 'CASCADE' },
+  )
+  galleryImages: Relation<ApplicationGalleryImageEntity[]>;
 
   // TODO should not be nullable
   @Column({ nullable: true, type: 'text' })
