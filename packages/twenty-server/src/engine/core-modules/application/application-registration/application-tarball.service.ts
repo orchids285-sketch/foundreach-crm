@@ -17,6 +17,7 @@ import {
   ApplicationRegistrationException,
   ApplicationRegistrationExceptionCode,
 } from 'src/engine/core-modules/application/application-registration/application-registration.exception';
+import { ApplicationManifestStorageService } from 'src/engine/core-modules/application/application-registration/application-manifest-storage.service';
 import { ApplicationRegistrationSourceType } from 'src/engine/core-modules/application/application-registration/enums/application-registration-source-type.enum';
 import { fromManifestApplicationToDisplayFields } from 'src/engine/core-modules/application/application-registration/utils/from-manifest-application-to-display-fields.util';
 import { extractTarballSecurely } from 'src/engine/core-modules/application/application-package/utils/extract-tarball-securely.util';
@@ -28,7 +29,7 @@ import {
 } from 'src/engine/core-modules/application/application-package/application-version-validation.service';
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { FileStorageService } from 'src/engine/core-modules/file-storage/file-storage.service';
-import type { ApplicationManifest } from 'twenty-shared/application';
+import type { ApplicationManifest, Manifest } from 'twenty-shared/application';
 import { ApplicationRegistrationVariableService } from 'src/engine/core-modules/application/application-registration-variable/application-registration-variable.service';
 
 @Injectable()
@@ -51,6 +52,7 @@ export class ApplicationTarballService {
     @InjectRepository(ApplicationRegistrationEntity)
     private readonly appRegistrationRepository: Repository<ApplicationRegistrationEntity>,
     private readonly fileStorageService: FileStorageService,
+    private readonly applicationManifestStorageService: ApplicationManifestStorageService,
     private readonly applicationService: ApplicationService,
     private readonly applicationRegistrationVariableService: ApplicationRegistrationVariableService,
     private readonly applicationVersionValidationService: ApplicationVersionValidationService,
@@ -204,11 +206,20 @@ export class ApplicationTarballService {
         },
       });
 
+      const manifestStoragePath =
+        await this.applicationManifestStorageService.writeManifest({
+          applicationRegistrationId: appRegistration.id,
+          manifest: manifest as Manifest,
+          sourceType: ApplicationRegistrationSourceType.TARBALL,
+          version: packageJson?.version ?? null,
+        });
+
       await this.appRegistrationRepository.update(appRegistration.id, {
         sourceType: ApplicationRegistrationSourceType.TARBALL,
         tarballFileId: savedFile.id,
         name: manifest.application?.displayName ?? 'Unknown App',
         manifest,
+        manifestStoragePath,
         ...fromManifestApplicationToDisplayFields(manifest.application),
         latestAvailableVersion: packageJson?.version ?? null,
         isListed: false,

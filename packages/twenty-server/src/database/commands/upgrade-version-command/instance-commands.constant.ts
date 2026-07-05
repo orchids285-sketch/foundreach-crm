@@ -97,6 +97,8 @@ import { AddLogoToApplicationRegistrationFastInstanceCommand } from './2-19/2-19
 import { BackfillLogoOnApplicationRegistrationSlowInstanceCommand } from './2-19/2-19-instance-command-slow-1783069673191-backfill-logo-on-application-registration';
 import { AddDisplayFieldsToApplicationRegistrationFastInstanceCommand } from './2-19/2-19-instance-command-fast-1783073776590-add-display-fields-to-application-registration';
 import { BackfillDisplayFieldsOnApplicationRegistrationSlowInstanceCommand } from './2-19/2-19-instance-command-slow-1783073776591-backfill-display-fields-on-application-registration';
+import { AddManifestStoragePathToApplicationRegistrationFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-19/2-19-instance-command-fast-1783231259220-add-manifest-storage-path-to-application-registration';
+import { BackfillManifestStoragePathOnApplicationRegistrationSlowInstanceCommand } from 'src/database/commands/upgrade-version-command/2-19/2-19-instance-command-slow-1783231279591-backfill-manifest-storage-path-on-application-registration';
 
 export const INSTANCE_COMMANDS = [
   AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand,
@@ -196,4 +198,6 @@ export const INSTANCE_COMMANDS = [
   AddDisplayFieldsToApplicationRegistrationFastInstanceCommand,
   BackfillDisplayFieldsOnApplicationRegistrationSlowInstanceCommand,
   AddStatusToFileFastInstanceCommand,
+  AddManifestStoragePathToApplicationRegistrationFastInstanceCommand,
+  BackfillManifestStoragePathOnApplicationRegistrationSlowInstanceCommand,
 ];

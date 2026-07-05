@@ -137,6 +137,13 @@ export class ApplicationRegistrationEntity {
   @Column({ nullable: true, type: 'text' })
   @WasIntroducedInUpgrade({
     upgradeCommandName:
+      '2.19.0_AddManifestStoragePathToApplicationRegistrationFastInstanceCommand_1783231259220',
+  })
+  manifestStoragePath: string | null;
+
+  @Column({ nullable: true, type: 'text' })
+  @WasIntroducedInUpgrade({
+    upgradeCommandName:
       '2.19.0_AddLogoToApplicationRegistrationFastInstanceCommand_1783069672191',
   })
   logo: string | null;
