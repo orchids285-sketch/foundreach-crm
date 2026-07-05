@@ -6,6 +6,7 @@ import { SettingsOptionCardContentSelect } from '@/settings/components/SettingsO
 import { canBeUnique } from '@/settings/data-model/fields/forms/utils/canBeUnique';
 import { t } from '@lingui/core/macro';
 import { type FieldMetadataType } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import { IconKey } from 'twenty-ui/icon';
 import { Toggle } from 'twenty-ui/input';
 
@@ -46,7 +47,11 @@ export const SettingsDataModelFieldIsUniqueForm = ({
       ),
   );
 
-  if (!canBeUnique({ type: fieldType })) {
+  // Unique on a computed field would reject writes to its source fields
+  if (
+    !canBeUnique({ type: fieldType }) ||
+    isDefined(fieldMetadataItem?.computation)
+  ) {
     return null;
   }
 

@@ -48,6 +48,16 @@ export const validateComputedFlatFieldMetadata = ({
     });
   }
 
+  // A unique constraint here would reject writes to the source fields instead
+  if (flatFieldMetadataToValidate.isUnique === true) {
+    errors.push({
+      code: FieldMetadataExceptionCode.INVALID_FIELD_INPUT,
+      message: 'Computed fields cannot be unique',
+      value: flatFieldMetadataToValidate.isUnique,
+      userFriendlyMessage: msg`Computed fields cannot be unique`,
+    });
+  }
+
   const siblingFlatFieldMetadatas = Object.values(
     flatFieldMetadataMaps.byUniversalIdentifier,
   )
